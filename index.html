@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GACORBOYY - V.64 FIX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg: #0b0e11; --card: #1e2124; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --border: rgba(255,255,255,0.08); --blue: #3b82f6; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0 auto; max-width: 500px; min-height: 100vh; overflow-x: hidden; }
+        .view-screen { display: none; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; background: var(--bg); z-index: 10; flex-direction: column; overflow-y: auto; }
+        .view-active { display: flex !important; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; }
+        .btn-gold { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; text-transform: uppercase; }
+        .header { padding: 10px 15px; background: #18191b; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .logo-txt { font-size: 1.4rem; font-weight: 900; color: var(--gold); font-style: italic; cursor: pointer; }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 100px; }
+        .game-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; text-align: center; font-size: 9px; }
+        .game-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .depo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .depo-item { background: #1e2124; border: 1px solid #333; padding: 12px 5px; border-radius: 10px; text-align: center; font-size: 11px; cursor: pointer; }
+        .modal-full { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; overflow-y: auto; }
+        #sm-area { height: 230px; background: radial-gradient(circle at bottom, #2d005f, #030508); border-radius: 20px; position: relative; overflow: hidden; margin: 15px; }
+        #sm-astro { position: absolute; bottom: 20px; left: 20px; font-size: 40px; }
+        .slot-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #000; padding: 10px; border-radius: 15px; margin: 15px; border: 2px solid var(--gold); }
+        .tile { aspect-ratio: 1/1; background: #111; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        #admin-view { background: #0b1118; position: fixed; inset: 0; z-index: 9999; display: none; flex-direction: row; max-width: 500px; margin: 0 auto; }
+        .adm-sidebar { width: 50px; background: #161b22; display: flex; flex-direction: column; align-items: center; padding-top: 20px; border-right: 1px solid #333; }
+        .adm-main { flex: 1; overflow-y: auto; padding: 15px; }
+        .adm-table { width: 100%; border-collapse: collapse; font-size: 9px; background: #1c222d; margin-top: 10px; }
+        .adm-table th, .adm-table td { padding: 8px; border-bottom: 1px solid #222; text-align: left; }
+        .footer { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: #18191b; display: flex; padding: 12px 0; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-link { flex: 1; text-align: center; color: #888; font-size: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="auth-view" class="view-screen view-active">
+        <div style="text-align:center; padding: 50px 20px;">
+            <h1 style="color:var(--gold); font-style:italic; font-size:2.5rem;">GACORBOYY</h1>
+            <div id="login-box" style="background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-top:20px;">
+                <h3>MEMBER LOGIN</h3>
+                <input type="text" id="log-u" placeholder="Username">
+                <input type="password" id="log-p" placeholder="Password">
+                <button class="btn-gold" onclick="handleAuth()">MASUK</button>
+                <p style="font-size:12px; margin-top:15px;">Belum punya ID? <span onclick="toggleAuth(true)" style="color:var(--gold); cursor:pointer;">DAFTAR</span></p>
+            </div>
+            <div id="reg-box" style="display:none; background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border); margin-top:20px;">
+                <h3>DAFTAR CLOUD</h3>
+                <input type="text" id="reg-u" placeholder="Username">
+                <input type="password" id="reg-p" placeholder="Password">
+                <input type="text" id="reg-bank" placeholder="Bank">
+                <input type="text" id="reg-nr" placeholder="No Rekening">
+                <button class="btn-gold" onclick="handleReg()">DAFTAR SEKARANG</button>
+                <p onclick="toggleAuth(false)" style="font-size:12px; margin-top:15px; color:var(--gold); cursor:pointer;">LOGIN</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app" class="view-screen">
+        <header class="header">
+            <div class="logo-txt" id="logo-trigger">GACORBOYY777</div>
+            <div style="background:#2c2f33; padding:6px 12px; border-radius:20px; border:1px solid var(--blue);">Rp <span id="u-bal">0</span></div>
+        </header>
+        <div class="game-grid" id="game-list"></div>
+        <nav class="footer">
+            <div onclick="location.reload()" class="nav-link">🏠<br>Rumah</div>
+            <div onclick="openFin('depo')" class="nav-link">💰<br>Deposit</div>
+            <div onclick="openFin('wd')" class="nav-link">💸<br>Tarik</div>
+            <div onclick="logout()" class="nav-link">👤<br>Keluar</div>
+        </nav>
+    </div>
+
+    <div id="modal-game" class="modal-full">
+        <div style="padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid #333; background:#18191b;"><b id="g-name">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:20px;">✕</span></div>
+        <div id="engine-sm" style="display:none; text-align:center; padding:20px;"><div id="sm-area"><div id="sm-astro">👨‍🚀</div><div id="sm-val" style="position:absolute; top:40%; width:100%; text-align:center; font-size:2.5rem; font-weight:900;">1.00x</div></div></div>
+        <div id="engine-slot" style="display:none; padding:15px;"><div class="slot-grid" id="slot-grid"></div></div>
+        <div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">PASANG TARUHAN</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">AMBIL UNTUNG</button></div>
+    </div>
+
+    <div id="modal-fin" class="modal-full">
+        <div style="padding:15px; display:flex; justify-content:space-between; border-bottom:1px solid #333;"><b id="fin-title">TRANSAKSI</b><span onclick="closeFin()" style="cursor:pointer; font-size:20px; font-weight:bold;">✕</span></div>
+        <div class="depo-grid" id="depo-grid"></div>
+        <div style="padding:15px;">
+            <input type="text" id="fin-bank" placeholder="Nama Bank (BCA/BRI/DANA)">
+            <input type="text" id="fin-norek" placeholder="Nomor Rekening">
+            <input type="text" id="fin-nama" placeholder="Nama Rekening">
+            <input type="number" id="fin-amt" placeholder="Nominal Rp" style="font-size:1.5rem; text-align:center;">
+            <button class="btn-gold" onclick="submitFin()">KONFIRMASI</button>
+        </div>
+    </div>
+
+    <div id="admin-view">
+        <div class="adm-sidebar"><div onclick="switchAdm('play')" style="padding:15px; cursor:pointer;">📊</div><div onclick="switchAdm('req')" style="padding:15px; cursor:pointer;">💸</div><div onclick="document.getElementById('admin-view').style.display='none'" style="padding:15px; cursor:pointer;">🚪</div></div>
+        <div class="adm-main">
+            <div id="adm-tab-play"><h4>Monitor Pemain</h4><table class="adm-table"><thead><tr><th>User</th><th>Saldo</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="adm-p-list"></tbody></table></div>
+            <div id="adm-tab-req" style="display:none"><h4>Permintaan Depo/WD</h4><table class="adm-table"><thead><tr><th>User</th><th>Tipe</th><th>Detail</th><th>Rp</th><th>Aksi</th></tr></thead><tbody id="adm-r-list"></tbody></table></div>
+        </div>
+    </div>
+
+    <script>
+        // FIREBASE CONFIG RIZZNESIA ASLI
+        const firebaseConfig = {
+            apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE",
+            authDomain: "gacorboy7777.firebaseapp.com",
+            databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "gacorboy7777",
+            storageBucket: "gacorboy7777.firebasestorage.app",
+            messagingSenderId: "204735062642",
+            appId: "1:204735062642:web:6e98451e6b4787156a58eb"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const fb = firebase.database();
+        const ADM_PASS = 'pepek777';
+        let sess = localStorage.getItem('RIZZ_SESS_CLOUD'), gInt, gM = 1.0, isF = false, finM = 'depo';
+
+        function toggleAuth(r) { document.getElementById('login-box').style.display = r?'none':'block'; document.getElementById('reg-box').style.display = r?'block':'none'; }
+        function handleReg() {
+            const u = document.getElementById('reg-u').value.trim().toLowerCase(), p = document.getElementById('reg-p').value;
+            if(!u || !p) return alert("Isi data!");
+            fb.ref('players/' + u).get().then(snap => {
+                if(snap.exists()) return alert("User ada!");
+                fb.ref('players/' + u).set({ u, p, bal: 0, r: 'random', b: document.getElementById('reg-bank').value, nr: document.getElementById('reg-nr').value });
+                alert("Berhasil!"); toggleAuth(false);
+            });
+        }
+        function handleAuth() {
+            const u = document.getElementById('log-u').value.trim().toLowerCase(), p = document.getElementById('log-p').value;
+            fb.ref('players/' + u).get().then(snap => {
+                const d = snap.val(); if(d && d.p === p) { sess = u; localStorage.setItem('RIZZ_SESS_CLOUD', u); location.reload(); } else alert("Salah!");
+            });
+        }
+        if(sess) {
+            document.getElementById('auth-view').classList.remove('view-active');
+            document.getElementById('main-app').classList.add('view-active');
+            fb.ref('players/' + sess).on('value', snap => { const u = snap.val(); if(u) document.getElementById('u-bal').innerText = Number(u.bal).toLocaleString(); });
+            renderLobby();
+        }
+
+        // FIX RENDER LOBBY & TAMBAH GAME BARU
+        function renderLobby() {
+            const games = [
+                {n:'Spaceman', img:'https://api.dicebear.com/7.x/bottts/svg?seed=sm'},
+                {n:'Mahjong Ways', img:'https://api.dicebear.com/7.x/initials/svg?seed=MJ'},
+                {n:'Gates Zeus', img:'https://api.dicebear.com/7.x/bottts/svg?seed=zeus'},
+                {n:'Starlight Princess', img:'https://api.dicebear.com/7.x/initials/svg?seed=SLP'}, // Game Baru
+                {n:'Sweet Bonanza', img:'https://api.dicebear.com/7.x/bottts/svg?seed=SB'}, // Game Baru
+                {n:'Sugar Rush', img:'https://api.dicebear.com/7.x/initials/svg?seed=SR'} // Game Baru
+            ];
+            const m = document.getElementById('game-list'); m.innerHTML = '';
+            // FIX: Sekarang onclick beneran manggil openGame(), bukan alert doang
+            games.forEach(g => { m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><img src="${g.img}"><div style="padding:5px;">${g.n}</div></div>`; });
+        }
+
+        function openGame(n) {
+            document.getElementById('g-name').innerText = n.toUpperCase(); document.getElementById('modal-game').style.display = 'flex';
+            document.getElementById('engine-sm').style.display = n==='Spaceman'?'block':'none';
+            document.getElementById('engine-slot').style.display = n!=='Spaceman'?'block':'none';
+            if(n !== 'Spaceman') { const g = document.getElementById('slot-grid'); g.innerHTML = ''; for(let i=0; i<15; i++) g.innerHTML += `<div class="tile">?</div>`; }
+            document.getElementById('btn-play').style.display = 'block'; document.getElementById('btn-cash').style.display = 'none';
+        }
+
+        function playGame() {
+            fb.ref('players/' + sess).get().then(snap => {
+                const u = snap.val(), b = parseInt(document.getElementById('bet-amt').value);
+                if(u.bal < b) return alert("Saldo Kurang!");
+                fb.ref('players/' + sess).update({ bal: u.bal - b });
+                if(document.getElementById('g-name').innerText === 'SPACEMAN') {
+                    document.getElementById('btn-play').style.display = 'none'; document.getElementById('btn-cash').style.display = 'block'; gM = 1.0;
+                    let cp = (u.r==='win')?15.0:(u.r==='loss')?1.05:(Math.random()*6+1.1);
+                    gInt = setInterval(() => { gM += 0.04; document.getElementById('sm-val').innerText = gM.toFixed(2)+"x"; document.getElementById('sm-astro').style.transform = `translate(${Math.min((gM-1)*25,240)}px, -${Math.min((gM-1)*12,120)}px)`; if(gM >= cp) { clearInterval(gInt); document.getElementById('sm-val').innerText = "BOOM!"; setTimeout(() => openGame('Spaceman'), 2000); }}, 100);
+                } else {
+                    const sym = ["🀄","🀅","🀆","⚡","💎","🍭","🍬"]; const g = document.getElementById('slot-grid'); g.innerHTML = '';
+                    for(let i=0; i<15; i++) { let s = sym[Math.floor(Math.random()*sym.length)]; if(u.r === 'win' && i < 3) s = "🀄"; g.innerHTML += `<div class="tile">${s}</div>`; }
+                    if(u.r==='win' || Math.random()<0.1) { fb.ref('players/' + sess).update({ bal: (u.bal-b) + b*5 }); alert("GACOR!"); }
+                }
+            });
+        }
+
+        function cashSM() { clearInterval(gInt); fb.ref('players/' + sess).get().then(snap => { fb.ref('players/' + sess).update({ bal: snap.val().bal + Math.floor(parseInt(document.getElementById('bet-amt').value)*gM) }); openGame('Spaceman'); }); }
+        function closeGame() { clearInterval(gInt); document.getElementById('modal-game').style.display = 'none'; }
+
+        function openFin(m) {
+            finM = m; document.getElementById('modal-fin').style.display = 'flex'; document.getElementById('fin-title').innerText = m === 'depo' ? 'DEPOSIT' : 'PENARIKAN';
+            const grid = document.getElementById('depo-grid'); grid.innerHTML = '';
+            const noms = [20000, 50000, 100000, 500000];
+            noms.forEach(n => { grid.innerHTML += `<div class="depo-item" onclick="document.getElementById('fin-amt').value=${n}">${n/1000}k</div>`; });
+        }
+        function closeFin() { document.getElementById('modal-fin').style.display = 'none'; }
+        function submitFin() {
+            const a = parseInt(document.getElementById('fin-amt').value);
+            const detail = `${document.getElementById('fin-bank').value} | ${document.getElementById('fin-norek').value} | ${document.getElementById('fin-nama').value}`;
+            if(!a || a < 10000) return alert("Minimal 10k!");
+            fb.ref('reqs').push({ u: sess, a, t: finM, detail, id: Date.now() });
+            alert("Tunggu ACC!"); closeFin();
+        }
+
+        let lC = 0; document.getElementById('logo-trigger').onclick = () => { lC++; if(lC>=5) { lC=0; if(prompt("Pass:")===ADM_PASS) { document.getElementById('admin-view').style.display='flex'; renderAdm(); }} };
+        function renderAdm() {
+            fb.ref('players').on('value', snap => {
+                const pb = document.getElementById('adm-p-list'); pb.innerHTML = '';
+                snap.forEach(c => { const p = c.val(); pb.innerHTML += `<tr><td>${p.u}</td><td>${p.bal}</td><td><b style="color:${p.r==='win'?'lime':(p.r==='loss'?'red':'#888')}">${p.r.toUpperCase()}</b></td><td><button onclick="setR('${p.u}','${p.r}')">SET</button><button onclick="inj('${p.u}')">💉</button></td></tr>`; });
+            });
+            fb.ref('reqs').on('value', snap => {
+                const rb = document.getElementById('adm-r-list'); rb.innerHTML = '';
+                snap.forEach(c => { const r = c.val(); rb.innerHTML += `<tr><td>${r.u}</td><td>${r.t.toUpperCase()}</td><td>${r.detail || '-'}</td><td>${r.a}</td><td><button onclick="appR('${c.key}')">ACC</button></td></tr>`; });
+            });
+        }
+        function setR(u, curR) { const newR = curR==='win'?'loss':(curR==='loss'?'random':'win'); fb.ref('players/'+u).update({r: newR}); }
+        function appR(k) { fb.ref('reqs/'+k).get().then(s => { const r = s.val(); fb.ref('players/'+r.u).get().then(pS => { let nB = r.t==='depo'?(pS.val().bal+r.a):(pS.val().bal-r.a); fb.ref('players/'+r.u).update({bal: nB}); fb.ref('reqs/'+k).remove(); }); }); }
+        function inj(u) { const a = parseInt(prompt("Rp:")); if(a) fb.ref('players/'+u).get().then(s => { fb.ref('players/'+u).update({bal: s.val().bal+a}); }); }
+        function switchAdm(t) { document.getElementById('adm-tab-play').style.display = t==='play'?'block':'none'; document.getElementById('adm-tab-req').style.display = t==='req'?'block':'none'; }
+        function logout() { localStorage.removeItem('RIZZ_SESS_CLOUD'); location.reload(); }
+    </script>
+</body>
+</html>
