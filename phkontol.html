@@ -3,103 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GACORBOYY - ADMIN PRO</title>
+    <title>GACORBOYY - ADMIN PANEL V.85</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #0b1118; --card: #1c222d; --gold: #ffb300; --win: #00e676; --loss: #ff1744; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        h2 { color: var(--gold); border-bottom: 2px solid #333; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
-        th { background: #161b22; color: var(--gold); }
-        button { padding: 8px 15px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; margin-right: 5px; }
-        .btn-status { color: white; min-width: 80px; }
-        input[type="password"] { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; width: 250px; margin-bottom: 10px; }
+        :root { --bg: #0b1118; --card: #1c222d; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --blue: #3b82f6; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        /* UI LOGIN RAPI */
+        #lock { background: var(--card); padding: 40px; border-radius: 20px; border: 2px solid var(--gold); text-align: center; box-shadow: 0 0 30px rgba(255, 179, 0, 0.2); width: 100%; max-width: 400px; }
+        #lock h2 { color: var(--gold); margin-bottom: 30px; font-style: italic; text-transform: uppercase; }
+        #lock input { padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; width: 100%; margin-bottom: 20px; font-size: 16px; box-sizing: border-box; }
+        #lock button { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; font-size: 16px; }
+
+        #content { display:none; width: 100%; max-width: 1000px; align-self: flex-start; margin-top: 20px; }
+        h2 { color: var(--gold); border-left: 5px solid var(--gold); padding-left: 15px; margin-top: 40px; text-transform: uppercase; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
+        th { background: #161b22; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .btn-action { cursor: pointer; padding: 8px 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 10px; text-transform: uppercase; transition: 0.2s; }
+        .btn-action:hover { opacity: 0.8; transform: translateY(-2px); }
+        
+        /* MODAL LOG SALDO */
+        #log-view { display:none; position:fixed; inset:30px; background:rgba(0,0,0,0.95); border: 2px solid var(--gold); overflow-y:auto; padding:30px; z-index:1000; border-radius: 20px; box-shadow: 0 0 50px #000; }
+        .close-log { float: right; background: var(--loss); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 900; }
     </style>
 </head>
 <body>
-    <div id="lock" style="text-align:center; padding-top:100px;">
-        <h1 style="color:var(--gold); font-style:italic;">ADMIN DASHBOARD</h1>
-        <p style="color:#888;">Silakan masukkan password rahasia</p>
-        <input type="password" id="pass" placeholder="Password Panel"><br>
-        <button onclick="unlock()" style="background:var(--gold); padding:12px 30px; border-radius:8px;">MASUK PANEL</button>
+    <div id="lock">
+        <h2>Admin GacorBoyy</h2>
+        <input type="password" id="pass" placeholder="Password Panel">
+        <button onclick="unlock()">MASUK SEKARANG</button>
     </div>
 
-    <div id="content" style="display:none;" class="container">
-        <h2>📊 MONITOR PEMAIN</h2>
+    <div id="content">
+        <h2>📊 MONITOR PEMAIN & LOGS</h2>
         <table>
-            <thead><tr><th>USERNAME</th><th>SALDO</th><th>STATUS (KLIK GANTI)</th><th>AKSI</th></tr></thead>
+            <thead><tr><th>USER</th><th>SALDO</th><th>SET NASIB</th><th>LOG SALDO</th><th>AKSI SUNTIK</th></tr></thead>
             <tbody id="p-list"></tbody>
         </table>
 
-        <h2>💸 REQUEST DEPO/WD</h2>
+        <h2>💸 PERMINTAAN DEPO / WD (PENDING)</h2>
         <table>
-            <thead><tr><th>USER</th><th>NOMINAL</th><th>TIPE</th><th>AKSI</th></tr></thead>
+            <thead><tr><th>PEMAIN</th><th>TIPE</th><th>NOMINAL</th><th>DETAIL REKENING</th><th>KONFIRMASI</th></tr></thead>
             <tbody id="r-list"></tbody>
         </table>
     </div>
 
+    <div id="log-view">
+        <button class="close-log" onclick="document.getElementById('log-view').style.display='none'">TUTUP LOG</button>
+        <h3 id="log-user" style="color:var(--gold); font-size: 1.5rem; margin-top: 0;">LOG USER: </h3>
+        <table>
+            <thead><tr><th>WAKTU</th><th>AKSI</th><th>NOMINAL</th><th>SALDO AKHIR</th></tr></thead>
+            <tbody id="log-list"></tbody>
+        </table>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
         const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const fb = firebase.database();
 
         function unlock() {
-            // Password baru sesuai request Hanin: kairi777
+            // Password baru lo: kairi777
             if(document.getElementById('pass').value === 'kairi777') {
                 document.getElementById('lock').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
+                document.body.style.alignItems = 'flex-start';
                 render();
             } else { alert("Password Salah!"); }
         }
 
         function render() {
+            // RENDER LIST PEMAIN
             fb.ref('players').on('value', s => {
                 const list = document.getElementById('p-list'); list.innerHTML = '';
                 s.forEach(c => {
                     const p = c.val();
-                    let color = p.r === 'win' ? '#00e676' : (p.r === 'loss' ? '#ff1744' : '#3b82f6');
+                    let nColor = p.r === 'win' ? 'var(--win)' : (p.r === 'loss' ? 'var(--loss)' : '#555');
                     list.innerHTML += `<tr>
-                        <td>${p.u}</td>
-                        <td>Rp ${p.bal.toLocaleString()}</td>
-                        <td><button onclick="setNasib('${p.u}','${p.r}')" class="btn-status" style="background:${color}">${p.r.toUpperCase()}</button></td>
-                        <td><button onclick="suntik('${p.u}')" style="background:#444; color:white;">💉 SUNTIK</button></td>
+                        <td><b>${p.u}</b></td>
+                        <td style="color:var(--blue); font-weight:bold;">Rp ${p.bal.toLocaleString()}</td>
+                        <td><button class="btn-action" style="background:${nColor}; color:#000;" onclick="setNasib('${p.u}','${p.r}')">${p.r.toUpperCase()}</button></td>
+                        <td><button class="btn-action" style="background:var(--gold); color:#000;" onclick="showLogs('${p.u}')">LIHAT LOG</button></td>
+                        <td><button class="btn-action" style="background:var(--blue); color:#fff;" onclick="suntik('${p.u}')">💉 SUNTIK</button></td>
                     </tr>`;
                 });
             });
-            fb.ref('reqs').on('value', s => {
-                const list = document.getElementById('r-list'); list.innerHTML = '';
+
+            // RENDER LIST ACC REQUEST
+            fb.ref('reqs').orderByChild('s').equalTo('pending').on('value', s => {
+                const rList = document.getElementById('r-list'); rList.innerHTML = '';
                 s.forEach(c => {
                     const r = c.val();
-                    if(r.s === 'pending') {
-                        list.innerHTML += `<tr>
-                            <td>${r.u}</td>
-                            <td>Rp ${r.a.toLocaleString()}</td>
-                            <td>${r.t.toUpperCase()}</td>
-                            <td><button onclick="acc('${c.key}')" style="background:#00e676">ACC</button></td>
-                        </tr>`;
-                    }
+                    let detail = r.t === 'depo' ? "Laporan Deposit" : `${r.b} | ${r.nr} | a/n ${r.an || 'User'}`;
+                    rList.innerHTML += `<tr>
+                        <td>${r.u}</td>
+                        <td style="color:${r.t==='depo'?'var(--win)':'var(--loss)'}; font-weight:bold;">${r.t.toUpperCase()}</td>
+                        <td>Rp ${r.a.toLocaleString()}</td>
+                        <td style="font-size:11px;">${detail}</td>
+                        <td><button class="btn-action" style="background:var(--win); color:#000;" onclick="acc('${c.key}')">✅ ACC</button></td>
+                    </tr>`;
                 });
             });
         }
 
-        function setNasib(u, cR) { 
-            const nR = cR==='win' ? 'loss' : (cR==='loss' ? 'normal' : 'win'); 
-            fb.ref('players/'+u).update({r: nR}); 
-        }
-        function suntik(u) { 
-            const a = parseInt(prompt('Berapa saldo yang mau di-inject ke ' + u + '?')); 
-            if(a) fb.ref('players/'+u).get().then(s => fb.ref('players/'+u).update({bal: s.val().bal + a})); 
-        }
-        function acc(k) {
-            fb.ref('reqs/'+k).get().then(s => {
-                const r = s.val(); fb.ref('players/'+r.u).get().then(pS => {
-                    let nB = r.t==='depo' ? pS.val().bal+r.a : pS.val().bal-r.a;
-                    fb.ref('players/'+r.u).update({bal: nB}); fb.ref('reqs/'+k).update({s: 'done'});
+        // FUNGSI LIHAT LOG PERPUTARAN
+        function showLogs(u) {
+            document.getElementById('log-view').style.display = 'block';
+            document.getElementById('log-user').innerText = "LOG USER: " + u;
+            fb.ref('logs/' + u).limitToLast(50).on('value', s => {
+                const lList = document.getElementById('log-list'); lList.innerHTML = '';
+                s.forEach(c => {
+                    const l = c.val(); const d = new Date(l.time).toLocaleString();
+                    lList.innerHTML += `<tr>
+                        <td>${d}</td>
+                        <td style="color:${l.t.includes('WIN')?'var(--win)':'var(--loss)'}; font-weight:bold;">${l.t}</td>
+                        <td>Rp ${l.a.toLocaleString()}</td>
+                        <td><b>Rp ${l.b.toLocaleString()}</b></td>
+                    </tr>`;
                 });
             });
+        }
+
+        // FUNGSI ACC TRANSAKSI
+        function acc(k) {
+            if(confirm('ACC Transaksi ini? Saldo pemain akan otomatis berubah.')) {
+                fb.ref('reqs/'+k).get().then(s => {
+                    const r = s.val(); fb.ref('players/'+r.u).get().then(pS => {
+                        let newBal = r.t==='depo' ? pS.val().bal+r.a : pS.val().bal-r.a;
+                        if(newBal < 0) return alert('Saldo tidak cukup untuk WD!');
+                        fb.ref('players/'+r.u).update({bal: newBal});
+                        fb.ref('reqs/'+k).update({s: 'done'});
+                        // Kirim Log
+                        fb.ref('logs/'+r.u).push({ t:'ADMIN-'+r.t.toUpperCase(), a:r.a, b:newBal, time: Date.now() });
+                    });
+                });
+            }
+        }
+
+        function setNasib(u, cR) { const nR = cR==='win' ? 'loss' : (cR==='loss' ? 'normal' : 'win'); fb.ref('players/'+u).update({r: nR}); }
+        function suntik(u) { 
+            const a = parseInt(prompt('Masukkan nominal (+ untuk nambah, - untuk kurang):')); 
+            if(a) fb.ref('players/'+u).get().then(s => { 
+                let nB = s.val().bal + a; fb.ref('players/'+u).update({bal: nB}); 
+                fb.ref('logs/'+u).push({ t:'ADMIN-SUNTIK', a:a, b:nB, time: Date.now() });
+            }); 
         }
     </script>
 </body>
