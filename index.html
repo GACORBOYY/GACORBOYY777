@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GACORBOYY - V.74 PRO</title>
+    <title>GACORBOYY - V.80 PRO TRANS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -21,18 +21,24 @@
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 120px; }
         .game-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: center; overflow: hidden; }
-        .slot-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; background:#000; padding:10px; border-radius:15px; border:2px solid var(--gold); }
+        .slot-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; background:#000; padding: 10px; border-radius: 15px; border: 2px solid var(--gold); }
         .tile { aspect-ratio:1/1; background:#111; display:flex; align-items:center; justify-content:center; font-size:1.2rem; border-radius:5px; }
         .spinning { animation: blur 0.1s infinite; }
         @keyframes blur { 0% { filter: blur(0px); } 50% { filter: blur(3px); transform: translateY(2px); } 100% { filter: blur(0px); } }
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; font-size: 14px; }
         .btn-gold { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; text-transform: uppercase; }
         .modal-full { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; overflow-y: auto; }
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: #18191b; display: flex; padding: 15px 0; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-link { flex: 1; text-align: center; color: #888; font-size: 9px; cursor: pointer; font-weight: 700; }
+        .info-box { background: var(--blue); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
+    <script>
+        const NO_DANA = "0812-XXXX-XXXX"; 
+        const NM_DANA = "RIZZNESIA OFFICIAL";
+    </script>
+
     <div id="jp-anim" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; align-items:center; justify-content:center; text-align:center;">
         <div style="padding:40px; border:4px solid var(--gold); border-radius:30px; background:radial-gradient(circle,#443300,#000); box-shadow:0 0 50px var(--gold);">
             <h1 style="color:var(--gold); font-size:2.5rem;">MEGA JACKPOT!</h1>
@@ -50,8 +56,8 @@
                 <p onclick="toggleAuth(true)" style="font-size:11px; margin-top:15px; color:#888;">Belum punya ID? <span style="color:var(--gold)">DAFTAR</span></p>
             </div>
             <div id="reg-box" style="display:none; background:var(--card); padding:25px; border-radius:20px; border:1px solid var(--border);">
-                <input type="text" id="reg-u" placeholder="Username"><input type="password" id="reg-p" placeholder="Password"><button class="btn-gold" onclick="handleReg()">DAFTAR</button>
-                <p onclick="toggleAuth(false)" style="font-size:11px; margin-top:15px; color:var(--gold); cursor:pointer;">LOGIN</p>
+                <input type="text" id="reg-u" placeholder="Username"><input type="password" id="reg-p" placeholder="Password"><button class="btn-gold" onclick="handleReg()">DAFTAR SEKARANG</button>
+                <p onclick="toggleAuth(false)" style="font-size:11px; margin-top:15px; color:var(--gold); cursor:pointer;">KEMBALI KE LOGIN</p>
             </div>
         </div>
     </div>
@@ -65,25 +71,58 @@
     </div>
 
     <div id="modal-game" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b id="g-name" style="color:var(--gold);">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:25px;">✕</span></div>
-        <div id="engine-sm" style="display:none; text-align:center;"><div style="height:230px; background:radial-gradient(circle,#2d005f,#030508); border-radius:20px; margin:15px; position:relative; overflow:hidden;"><div id="sm-astro" style="position:absolute; bottom:20px; left:20px; font-size:40px;">👨‍🚀</div><div id="sm-val" style="position:absolute; top:40%; width:100%; text-align:center; font-size:3rem; font-weight:900;">1.00x</div></div></div>
+        <div id="engine-sm" style="display:none; text-align:center;">
+            <div style="height:250px; background:radial-gradient(circle at bottom left,#2d005f,#030508); border-radius:20px; margin:15px; position:relative; overflow:hidden;">
+                <div id="rocket-container" style="position:absolute; bottom:5%; left:5%; transition: all 0.1s linear; text-align: center;">
+                    <div style="font-size:50px; filter: drop-shadow(0 0 10px var(--gold)); transform: rotate(45deg);">🚀</div>
+                    <div id="sm-val" style="font-size:2rem; font-weight:900; color:#fff; text-shadow: 2px 2px 4px #000;">1.00x</div>
+                </div>
+            </div>
+        </div>
         <div id="engine-slot" style="display:none; padding:15px;"><div class="slot-grid" id="slot-grid"></div></div>
         <div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">SPIN SEKARANG</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">AMBIL JP</button></div>
     </div>
 
-    <div id="modal-depo" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>DEPOSIT</b><span onclick="document.getElementById('modal-depo').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><input type="number" id="depo-amt" placeholder="Nominal Rp"><input type="text" id="depo-note" placeholder="Nama Pengirim"><button class="btn-gold" onclick="submitDepo()">KONFIRMASI</button></div></div>
-    <div id="modal-wd" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>WITHDRAW</b><span onclick="document.getElementById('modal-wd').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><select id="wd-bank"><option value="BCA">BCA</option><option value="DANA">DANA</option><option value="BRI">BRI</option></select><input type="text" id="wd-norek" placeholder="No Rekening/HP"><input type="number" id="wd-amt" placeholder="Nominal WD"><button class="btn-gold" onclick="submitWD()">TARIK SALDO</button></div></div>
-    <div id="modal-hist" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>HISTORY</b><span onclick="document.getElementById('modal-hist').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
+    <div id="modal-depo" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>FORM DEPOSIT</b><span onclick="document.getElementById('modal-depo').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div>
+        <div style="padding:20px;">
+            <div class="info-box">
+                <small>SILAKAN TRANSFER KE:</small><br>
+                <b style="font-size:1.4rem; color:#fff;" id="dana-num"></b><br>
+                <small id="dana-name"></small>
+            </div>
+            <label style="font-size:12px; color:#888;">Nominal Deposit:</label>
+            <input type="number" id="depo-amt" placeholder="Contoh: 50000">
+            <label style="font-size:12px; color:#888;">Nama Akun Pengirim:</label>
+            <input type="text" id="depo-note" placeholder="Nama di aplikasi DANA lo">
+            <button class="btn-gold" onclick="submitDepo()">KONFIRMASI PEMBAYARAN</button>
+        </div>
+    </div>
+
+    <div id="modal-wd" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>FORM PENARIKAN (WD)</b><span onclick="document.getElementById('modal-wd').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div>
+        <div style="padding:20px;">
+            <label style="font-size:12px; color:#888;">Pilih Bank/E-Wallet:</label>
+            <select id="wd-bank"><option value="DANA">DANA</option><option value="BCA">BCA</option><option value="BRI">BRI</option><option value="BNI">BNI</option><option value="MANDIRI">MANDIRI</option></select>
+            <label style="font-size:12px; color:#888;">Nomor Rekening/HP:</label>
+            <input type="text" id="wd-norek" placeholder="Contoh: 08123456789">
+            <label style="font-size:12px; color:#888;">Nama Pemilik Rekening:</label>
+            <input type="text" id="wd-accname" placeholder="Nama Lengkap Sesuai Bank">
+            <label style="font-size:12px; color:#888;">Nominal Tarik Saldo:</label>
+            <input type="number" id="wd-amt" placeholder="Minimal Rp 50.000">
+            <button class="btn-gold" onclick="submitWD()">TARIK SALDO SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="modal-hist" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>HISTORY TRANSAKSI</b><span onclick="document.getElementById('modal-hist').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
 
     <script>
         const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const fb = firebase.database(); let sess = localStorage.getItem('RIZZ_SESS_CLOUD'), gInt, gM = 1.0;
+        document.getElementById('dana-num').innerText = NO_DANA;
+        document.getElementById('dana-name').innerText = "A/N: " + NM_DANA;
 
-        const nms = ["Suryadi", "Nurul_H", "Budi_S", "Agus_K", "Putri_R", "Siti_A", "Eko_P", "Dewi_S", "Kevin_W", "Indra_G", "Rina_M", "Fajar_S", "Chandra", "Ahmad_Z", "Sari_K"];
+        const nms = ["Suryadi", "Nurul_H", "Budi_S", "Agus_K", "Putri_R", "Siti_A", "Eko_P", "Dewi_S", "Kevin_W", "Indra_G"];
         const tkr = document.getElementById('win-tkr');
-        for(let i=0; i<30; i++) { 
-            let name = nms[Math.floor(Math.random()*nms.length)] + "_" + Math.floor(Math.random()*99);
-            tkr.innerHTML += ` 🔥 ${name} JP <span style="color:var(--win)">Rp ${(Math.random()*85 + 5).toFixed(1)}jt</span> • `; 
-        }
+        for(let i=0; i<25; i++) { tkr.innerHTML += ` 🔥 ${nms[Math.floor(Math.random()*nms.length)]} JP <span style="color:var(--win)">Rp ${(Math.random()*60 + 5).toFixed(1)}jt</span> • `; }
 
         function toggleAuth(r) { document.getElementById('login-box').style.display = r?'none':'block'; document.getElementById('reg-box').style.display = r?'block':'none'; }
         function handleReg() { const u = document.getElementById('reg-u').value.toLowerCase(), p = document.getElementById('reg-p').value; if(u&&p) fb.ref('players/'+u).set({u,p,bal:0,r:'normal'}).then(()=>toggleAuth(false)); }
@@ -91,13 +130,13 @@
         if(sess) { document.getElementById('auth-view').classList.remove('view-active'); document.getElementById('main-app').classList.add('view-active'); fb.ref('players/'+sess).on('value', s=>{ if(s.val()) document.getElementById('u-bal').innerText = Number(s.val().bal).toLocaleString(); }); renderLobby(); }
 
         function renderLobby() {
-            const gs = [{n:'Spaceman',i:'👨‍🚀'},{n:'Gates Zeus',i:'⚡'},{n:'Mahjong Ways',i:'🀄'},{n:'Sugar Rush',i:'🍭'},{n:'Sweet Bonanza',i:'🍬'},{n:'Princess',i:'⭐'},{n:'West Gold',i:'🤠'},{n:'Aztec Gems',i:'💎'},{n:'Power Thor',i:'🔨'}];
+            const gs = [{n:'Spaceman',i:'🚀'},{n:'Gates Zeus',i:'⚡'},{n:'Mahjong Ways',i:'🀄'},{n:'Sugar Rush',i:'🍭'},{n:'Sweet Bonanza',i:'🍬'},{n:'Princess',i:'⭐'},{n:'West Gold',i:'🤠'},{n:'Aztec Gems',i:'💎'},{n:'Power Thor',i:'🔨'}];
             const m = document.getElementById('game-list'); m.innerHTML = '';
             gs.forEach(g=>{ m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><div style="font-size:40px; padding:20px; background:#222;">${g.i}</div><div style="padding:8px;font-size:9px;font-weight:900;">${g.n.toUpperCase()}</div></div>`; });
             const gGrid = document.getElementById('slot-grid'); gGrid.innerHTML=''; for(let i=0;i<15;i++) gGrid.innerHTML+='<div class="tile">?</div>';
         }
-
-        function openGame(n) { document.getElementById('g-name').innerText=n; document.getElementById('modal-game').style.display='flex'; document.getElementById('engine-sm').style.display=n==='Spaceman'?'block':'none'; document.getElementById('engine-slot').style.display=n!=='Spaceman'?'block':'none'; document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; }
+        function openGame(n) { document.getElementById('g-name').innerText=n.toUpperCase(); document.getElementById('modal-game').style.display='flex'; document.getElementById('engine-sm').style.display=n==='Spaceman'?'block':'none'; document.getElementById('engine-slot').style.display=n!=='Spaceman'?'block':'none'; document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; document.getElementById('sm-val').innerText='1.00x'; document.getElementById('rocket-container').style.bottom = '5%'; document.getElementById('rocket-container').style.left = '5%'; gM=1.0; }
+        
         function playGame() {
             fb.ref('players/'+sess).get().then(s=>{
                 const u=s.val(), b=parseInt(document.getElementById('bet-amt').value); if(u.bal<b) return alert('Saldo Kurang!');
@@ -106,26 +145,32 @@
                 setTimeout(() => {
                     tiles.forEach(t => t.classList.remove('spinning'));
                     let isWin = u.r === 'win' ? true : (u.r === 'loss' ? false : Math.random() < 0.02); 
-                    if(document.getElementById('g-name').innerText==='Spaceman'){
-                        document.getElementById('btn-play').style.display='none'; document.getElementById('btn-cash').style.display='block'; gM=1.0;
-                        let cp = isWin ? (Math.random()*10+5) : 1.05;
-                        gInt=setInterval(()=>{ gM+=0.06; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x'; if(gM>=cp){ clearInterval(gInt); document.getElementById('sm-val').innerText='BOOM!'; }},100);
+                    if(document.getElementById('g-name').innerText==='SPACEMAN'){
+                        document.getElementById('btn-play').style.display='none'; document.getElementById('btn-cash').style.display='block'; gM=1.0; 
+                        let cp = isWin ? (Math.random()*10+5) : (Math.random()*0.5 + 1.1);
+                        gInt=setInterval(()=>{ 
+                            gM += 0.07; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x';
+                            let prg = (gM - 1) * 8 + 5; if(prg > 85) prg = 85;
+                            document.getElementById('rocket-container').style.bottom = prg + '%'; document.getElementById('rocket-container').style.left = prg + '%';
+                            if(gM >= cp){ clearInterval(gInt); document.getElementById('sm-val').innerText='BOOM!'; setTimeout(()=> { document.getElementById('sm-val').innerText='1.00x'; document.getElementById('rocket-container').style.bottom = '5%'; document.getElementById('rocket-container').style.left = '5%'; document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; }, 2000); }
+                        }, 100);
                     } else {
                         const sym = ["💎","⚡","🍒","🔔","7️⃣"];
-                        tiles.forEach((t, i) => { let s = sym[Math.floor(Math.random()*5)]; if(isWin && i<3) s="💎"; t.innerText = s; });
-                        if(isWin){ let win = b*5; fb.ref('players/'+sess).update({bal:(u.bal-b)+win}); document.getElementById('jp-val').innerText = 'Rp ' + win.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; } else { alert('Belum Beruntung!'); }
+                        tiles.forEach((t, i) => { let sy = sym[Math.floor(Math.random()*5)]; if(isWin && i<3) sy="💎"; t.innerText = sy; });
+                        if(isWin){ let win = b*10; fb.ref('players/'+sess).update({bal:(u.bal-b)+win}); document.getElementById('jp-val').innerText = 'Rp ' + win.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; } else { alert('Belum Beruntung!'); }
                     }
                 }, 1500);
             });
         }
-        function cashSM(){ clearInterval(gInt); fb.ref('players/'+sess).get().then(s=>{ let w=Math.floor(parseInt(document.getElementById('bet-amt').value)*gM); fb.ref('players/'+sess).update({bal:s.val().bal+w}); document.getElementById('jp-val').innerText='Rp '+w.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; }); }
+        function cashSM(){ clearInterval(gInt); fb.ref('players/'+sess).get().then(s=>{ let w = Math.floor(parseInt(document.getElementById('bet-amt').value) * gM); fb.ref('players/'+sess).update({bal: s.val().bal + w}); document.getElementById('jp-val').innerText = 'Rp ' + w.toLocaleString(); document.getElementById('jp-anim').style.display = 'flex'; document.getElementById('sm-val').innerText = '1.00x'; document.getElementById('rocket-container').style.bottom = '5%'; document.getElementById('rocket-container').style.left = '5%'; gM = 1.0; document.getElementById('btn-play').style.display = 'block'; document.getElementById('btn-cash').style.display = 'none'; }); }
         function closeGame(){ clearInterval(gInt); document.getElementById('modal-game').style.display='none'; }
         function openDepo(){ document.getElementById('modal-depo').style.display='flex'; }
         function openWD(){ document.getElementById('modal-wd').style.display='flex'; }
-        function submitDepo(){ const a=parseInt(document.getElementById('depo-amt').value); if(a>=10000){ fb.ref('reqs').push({u:sess,a,t:'depo',n:document.getElementById('depo-note').value,s:'pending'}); alert('Laporan Terkirim!'); document.getElementById('modal-depo').style.display='none'; } }
-        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,s:'pending'}); alert('Permintaan WD Dikirim!'); document.getElementById('modal-wd').style.display='none'; } }
+        function submitDepo(){ const a=parseInt(document.getElementById('depo-amt').value); if(a>=10000){ fb.ref('reqs').push({u:sess,a,t:'depo',n:document.getElementById('depo-note').value,s:'pending'}); alert('Laporan Depo Terkirim!'); document.getElementById('modal-depo').style.display='none'; } }
+        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,an:document.getElementById('wd-accname').value,s:'pending'}); alert('Laporan WD Terkirim!'); document.getElementById('modal-wd').style.display='none'; } }
         function openHistory(){ document.getElementById('modal-hist').style.display='flex'; fb.ref('reqs').orderByChild('u').equalTo(sess).on('value', s=>{ const hl=document.getElementById('hist-list'); hl.innerHTML=''; s.forEach(c=>{ const r=c.val(); hl.innerHTML+=`<div style="background:#222;padding:12px;border-radius:10px;margin-bottom:8px;font-size:11px;border-left:4px solid var(--blue)"><b>${r.t.toUpperCase()}</b>: Rp ${r.a.toLocaleString()} <br> <span style="color:${r.s==='pending'?'#ffb300':'#00e676'}">${r.s.toUpperCase()}</span></div>`; }); }); }
         function logout(){ localStorage.removeItem('RIZZ_SESS_CLOUD'); location.reload(); }
     </script>
 </body>
-</html>
+    </html>
+    
