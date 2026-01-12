@@ -3,160 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GACORBOYY - V.71 SUPER ROYAL</title>
+    <title>GACORBOYY - V.74 PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #0b0e11; --card: #1e2124; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --border: rgba(255,255,255,0.1); --blue: #3b82f6; }
+        :root { --bg: #0b0e11; --card: #1e2124; --gold: #ffb300; --win: #00e676; --border: rgba(255,255,255,0.1); --blue: #3b82f6; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0 auto; max-width: 500px; min-height: 100vh; overflow-x: hidden; }
         .view-screen { display: none; width: 100%; height: 100vh; position: fixed; inset: 0; background: var(--bg); z-index: 10; flex-direction: column; overflow-y: auto; }
         .view-active { display: flex !important; }
-        
-        /* HEADER BARU */
-        .top-bar { background: #111; color: var(--gold); text-align: center; font-size: 10px; padding: 5px; letter-spacing: 1px; font-weight: 700; border-bottom: 1px solid #333; }
+        .top-bar { background: #111; color: var(--gold); text-align: center; font-size: 10px; padding: 5px; font-weight: 700; border-bottom: 1px solid #333; }
         .header { padding: 12px 15px; background: #18191b; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); }
-        .logo-txt { font-size: 1.4rem; font-weight: 900; color: var(--gold); font-style: italic; cursor: pointer; }
-        
-        /* MEGA JACKPOT OVERLAY */
-        #jp-anim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; text-align: center; }
-        .jp-box { padding: 40px; border: 4px solid var(--gold); border-radius: 30px; background: radial-gradient(circle, #443300, #000); box-shadow: 0 0 50px var(--gold); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
+        .logo-txt { font-size: 1.4rem; font-weight: 900; color: var(--gold); font-style: italic; }
+        .ticker-wrap { background: #000; padding: 8px; overflow: hidden; white-space: nowrap; border-bottom: 1px solid var(--border); }
+        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; font-size: 11px; font-weight: 700; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 120px; }
         .game-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: center; overflow: hidden; }
-        .game-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        
+        .slot-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; background:#000; padding:10px; border-radius:15px; border:2px solid var(--gold); }
+        .tile { aspect-ratio:1/1; background:#111; display:flex; align-items:center; justify-content:center; font-size:1.2rem; border-radius:5px; }
+        .spinning { animation: blur 0.1s infinite; }
+        @keyframes blur { 0% { filter: blur(0px); } 50% { filter: blur(3px); transform: translateY(2px); } 100% { filter: blur(0px); } }
         input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; }
         .btn-gold { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; text-transform: uppercase; }
         .modal-full { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; overflow-y: auto; }
-        .modal-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; background: #18191b; position: sticky; top: 0; }
-        
-        /* ADMIN UI */
-        #admin-view { background: #0b1118; position: fixed; inset: 0; z-index: 9999; display: none; flex-direction: row; }
-        .adm-sidebar { width: 60px; background: #161b22; display: flex; flex-direction: column; align-items: center; padding-top: 20px; border-right: 1px solid #333; }
-        .adm-main { flex: 1; overflow-y: auto; padding: 20px; }
-        .adm-table { width: 100%; border-collapse: collapse; font-size: 10px; background: #1c222d; margin-top: 15px; }
-        .adm-table th, .adm-table td { padding: 10px; border-bottom: 1px solid #222; text-align: left; }
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: #18191b; display: flex; padding: 15px 0; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-link { flex: 1; text-align: center; color: #888; font-size: 9px; cursor: pointer; font-weight: 700; }
     </style>
 </head>
 <body>
-    <div id="jp-anim"><div class="jp-box"><h1 style="color:var(--gold); font-size:2.5rem;">MEGA JACKPOT!</h1><h2 id="jp-val" style="color:var(--win); font-size:1.8rem;">Rp 0</h2><button class="btn-gold" style="margin-top:20px; width:auto; padding:10px 40px;" onclick="closeJP()">AMBIL SEKARANG</button></div></div>
+    <div id="jp-anim" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; align-items:center; justify-content:center; text-align:center;">
+        <div style="padding:40px; border:4px solid var(--gold); border-radius:30px; background:radial-gradient(circle,#443300,#000); box-shadow:0 0 50px var(--gold);">
+            <h1 style="color:var(--gold); font-size:2.5rem;">MEGA JACKPOT!</h1>
+            <h2 id="jp-val" style="color:var(--win); font-size:1.8rem;">Rp 0</h2>
+            <button class="btn-gold" style="margin-top:20px; width:auto; padding:10px 40px;" onclick="document.getElementById('jp-anim').style.display='none'">AMBIL</button>
+        </div>
+    </div>
 
     <div id="auth-view" class="view-screen view-active">
         <div style="text-align:center; padding: 60px 20px;">
-            <h1 style="color:var(--gold); font-style:italic; font-size:3rem; margin-bottom: 10px;">GACORBOYY</h1>
-            <p style="font-size: 12px; color: var(--gold); margin-top: -10px; margin-bottom: 40px; font-weight:bold; letter-spacing: 1px;">PLATFORM JUDI TERPERCAYA</p>
-            
+            <h1 style="color:var(--gold); font-style:italic; font-size:3rem; margin-bottom:10px;">GACORBOYY</h1>
+            <p style="font-size: 11px; color: var(--gold); font-weight:bold; margin-bottom:40px;">PLATFORM JUDI TERPERCAYA DI INDONESIA</p>
             <div id="login-box" style="background:var(--card); padding:25px; border-radius:20px; border:1px solid var(--border);">
-                <h3>LOGIN</h3><input type="text" id="log-u" placeholder="Username"><input type="password" id="log-p" placeholder="Password"><button class="btn-gold" onclick="handleAuth()">MASUK</button>
-                <p onclick="toggleAuth(true)" style="font-size:12px; margin-top:15px; color:var(--gold); cursor:pointer;">Belum punya ID? DAFTAR</p>
+                <input type="text" id="log-u" placeholder="Username"><input type="password" id="log-p" placeholder="Password"><button class="btn-gold" onclick="handleAuth()">MASUK</button>
+                <p onclick="toggleAuth(true)" style="font-size:11px; margin-top:15px; color:#888;">Belum punya ID? <span style="color:var(--gold)">DAFTAR</span></p>
             </div>
             <div id="reg-box" style="display:none; background:var(--card); padding:25px; border-radius:20px; border:1px solid var(--border);">
-                <h3>DAFTAR</h3><input type="text" id="reg-u" placeholder="Username"><input type="password" id="reg-p" placeholder="Password"><button class="btn-gold" onclick="handleReg()">DAFTAR</button>
-                <p onclick="toggleAuth(false)" style="font-size:12px; margin-top:15px; color:var(--gold); cursor:pointer;">KEMBALI KE LOGIN</p>
+                <input type="text" id="reg-u" placeholder="Username"><input type="password" id="reg-p" placeholder="Password"><button class="btn-gold" onclick="handleReg()">DAFTAR</button>
+                <p onclick="toggleAuth(false)" style="font-size:11px; margin-top:15px; color:var(--gold); cursor:pointer;">LOGIN</p>
             </div>
         </div>
     </div>
 
     <div id="main-app" class="view-screen">
         <div class="top-bar">PLATFORM JUDI TERPERCAYA DI INDONESIA</div>
-        <header class="header"><div class="logo-txt" id="logo-trigger">GACORBOYY777</div><div style="background:#2c2f33; padding:8px 15px; border-radius:20px; border:1px solid var(--blue); font-weight: 900;">Rp <span id="u-bal">0</span></div></header>
+        <header class="header"><div class="logo-txt">GACORBOYY777</div><div style="background:#222; padding:8px 15px; border-radius:20px; border:1px solid var(--blue); font-weight: 900;">Rp <span id="u-bal">0</span></div></header>
+        <div class="ticker-wrap"><div class="ticker-move" id="win-tkr"></div></div>
         <div class="game-grid" id="game-list"></div>
         <nav class="footer"><div onclick="location.reload()" class="nav-link">🏠<br>HOME</div><div onclick="openDepo()" class="nav-link">💰<br>DEPO</div><div onclick="openWD()" class="nav-link">💸<br>WD</div><div onclick="openHistory()" class="nav-link">📜<br>HISTORY</div><div onclick="logout()" class="nav-link">👤<br>OUT</div></nav>
     </div>
 
-    <div id="modal-game" class="modal-full"><div class="modal-header"><b id="g-name" style="color:var(--gold);">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:25px;">✕</span></div>
+    <div id="modal-game" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b id="g-name" style="color:var(--gold);">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:25px;">✕</span></div>
         <div id="engine-sm" style="display:none; text-align:center;"><div style="height:230px; background:radial-gradient(circle,#2d005f,#030508); border-radius:20px; margin:15px; position:relative; overflow:hidden;"><div id="sm-astro" style="position:absolute; bottom:20px; left:20px; font-size:40px;">👨‍🚀</div><div id="sm-val" style="position:absolute; top:40%; width:100%; text-align:center; font-size:3rem; font-weight:900;">1.00x</div></div></div>
-        <div id="engine-slot" style="display:none; padding:15px;"><div class="slot-grid" id="slot-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:5px; background:#000; padding:10px; border-radius:15px; border:2px solid var(--gold);"></div></div>
-        <div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">SPIN SEKARANG</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">AMBIL KEMENANGAN</button></div>
+        <div id="engine-slot" style="display:none; padding:15px;"><div class="slot-grid" id="slot-grid"></div></div>
+        <div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">SPIN SEKARANG</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">AMBIL JP</button></div>
     </div>
 
-    <div id="modal-depo" class="modal-full"><div class="modal-header"><b>FORM DEPOSIT</b><span onclick="document.getElementById('modal-depo').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div>
-        <div style="padding:20px;">
-            <div style="background:var(--blue); padding:15px; border-radius:15px; margin-bottom:15px; text-align:center;"><small>TRANSFER DANA KE:</small><br><b style="font-size:1.4rem;">0812-XXXX-XXXX</b><br><small>A/N: RIZZNESIA OFFICIAL</small></div>
-            <input type="number" id="depo-amt" placeholder="Nominal Rp"><input type="text" id="depo-note" placeholder="Nama Akun Pengirim"><button class="btn-gold" onclick="submitDepo()">KONFIRMASI DEPOSIT</button>
-        </div>
-    </div>
-
-    <div id="modal-wd" class="modal-full"><div class="modal-header"><b>FORM PENARIKAN (WD)</b><span onclick="document.getElementById('modal-wd').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div>
-        <div style="padding:20px;"><select id="wd-bank"><option value="BCA">BCA</option><option value="DANA">DANA</option><option value="BRI">BRI</option><option value="BNI">BNI</option></select><input type="text" id="wd-norek" placeholder="Nomor Rekening / No HP"><input type="text" id="wd-name" placeholder="Nama Sesuai Rekening"><input type="number" id="wd-amt" placeholder="Nominal WD (Rp)"><button class="btn-gold" onclick="submitWD()">TARIK SALDO SEKARANG</button></div>
-    </div>
-
-    <div id="modal-hist" class="modal-full"><div class="modal-header"><b>HISTORY TRANSAKSI</b><span onclick="document.getElementById('modal-hist').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
-
-    <div id="admin-view"><div class="adm-sidebar"><div id="b-a-p" class="adm-tab-btn" onclick="switchAdm('play')" style="padding:15px;">📊</div><div id="b-a-r" class="adm-tab-btn" onclick="switchAdm('req')" style="padding:15px;">💸</div><div style="margin-top:auto; padding:15px;" onclick="document.getElementById('admin-view').style.display='none'">🚪</div></div>
-        <div class="adm-main"><div id="adm-tab-play"><h3>MONITOR USER</h3><table class="adm-table"><thead><tr><th>USER</th><th>SALDO</th><th>NASIB</th><th>AKSI</th></tr></thead><tbody id="adm-p-list"></tbody></table></div><div id="adm-tab-req" style="display:none"><h3>REQUESTS</h3><table class="adm-table"><thead><tr><th>USER</th><th>RP</th><th>TIPE</th><th>AKSI</th></tr></thead><tbody id="adm-r-list"></tbody></table></div></div>
-    </div>
+    <div id="modal-depo" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>DEPOSIT</b><span onclick="document.getElementById('modal-depo').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><input type="number" id="depo-amt" placeholder="Nominal Rp"><input type="text" id="depo-note" placeholder="Nama Pengirim"><button class="btn-gold" onclick="submitDepo()">KONFIRMASI</button></div></div>
+    <div id="modal-wd" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>WITHDRAW</b><span onclick="document.getElementById('modal-wd').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><select id="wd-bank"><option value="BCA">BCA</option><option value="DANA">DANA</option><option value="BRI">BRI</option></select><input type="text" id="wd-norek" placeholder="No Rekening/HP"><input type="number" id="wd-amt" placeholder="Nominal WD"><button class="btn-gold" onclick="submitWD()">TARIK SALDO</button></div></div>
+    <div id="modal-hist" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>HISTORY</b><span onclick="document.getElementById('modal-hist').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
 
     <script>
         const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const fb = firebase.database(); let sess = localStorage.getItem('RIZZ_SESS_CLOUD'), gInt, gM = 1.0;
+
+        const nms = ["Suryadi", "Nurul_H", "Budi_S", "Agus_K", "Putri_R", "Siti_A", "Eko_P", "Dewi_S", "Kevin_W", "Indra_G", "Rina_M", "Fajar_S", "Chandra", "Ahmad_Z", "Sari_K"];
+        const tkr = document.getElementById('win-tkr');
+        for(let i=0; i<30; i++) { 
+            let name = nms[Math.floor(Math.random()*nms.length)] + "_" + Math.floor(Math.random()*99);
+            tkr.innerHTML += ` 🔥 ${name} JP <span style="color:var(--win)">Rp ${(Math.random()*85 + 5).toFixed(1)}jt</span> • `; 
+        }
 
         function toggleAuth(r) { document.getElementById('login-box').style.display = r?'none':'block'; document.getElementById('reg-box').style.display = r?'block':'none'; }
         function handleReg() { const u = document.getElementById('reg-u').value.toLowerCase(), p = document.getElementById('reg-p').value; if(u&&p) fb.ref('players/'+u).set({u,p,bal:0,r:'normal'}).then(()=>toggleAuth(false)); }
         function handleAuth() { const u = document.getElementById('log-u').value.toLowerCase(), p = document.getElementById('log-p').value; fb.ref('players/'+u).get().then(s=>{ const d=s.val(); if(d&&d.p===p){sess=u; localStorage.setItem('RIZZ_SESS_CLOUD',u); location.reload();} }); }
         if(sess) { document.getElementById('auth-view').classList.remove('view-active'); document.getElementById('main-app').classList.add('view-active'); fb.ref('players/'+sess).on('value', s=>{ if(s.val()) document.getElementById('u-bal').innerText = Number(s.val().bal).toLocaleString(); }); renderLobby(); }
 
-        // Request Hanin 3: Tambah Game & Pastikan No Bug
         function renderLobby() {
-            const gs = [
-                {n:'Spaceman',i:'sm'},{n:'Gates Zeus',i:'zs'},{n:'Mahjong Ways',i:'mj'},
-                {n:'Sugar Rush',i:'sr'},{n:'Sweet Bonanza',i:'sb'},
-                {n:'Starlight Princess',i:'sp'}, {n:'Wild West Gold',i:'wwg'}, // Game Baru
-                {n:'Aztec Gems',i:'ag'}, {n:'Power of Thor',i:'pot'} // Game Baru
-            ];
+            const gs = [{n:'Spaceman',i:'👨‍🚀'},{n:'Gates Zeus',i:'⚡'},{n:'Mahjong Ways',i:'🀄'},{n:'Sugar Rush',i:'🍭'},{n:'Sweet Bonanza',i:'🍬'},{n:'Princess',i:'⭐'},{n:'West Gold',i:'🤠'},{n:'Aztec Gems',i:'💎'},{n:'Power Thor',i:'🔨'}];
             const m = document.getElementById('game-list'); m.innerHTML = '';
-            gs.forEach(g=>{ m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=${g.i}"><div style="padding:8px;font-size:9px;font-weight:900;">${g.n.toUpperCase()}</div></div>`; });
+            gs.forEach(g=>{ m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><div style="font-size:40px; padding:20px; background:#222;">${g.i}</div><div style="padding:8px;font-size:9px;font-weight:900;">${g.n.toUpperCase()}</div></div>`; });
+            const gGrid = document.getElementById('slot-grid'); gGrid.innerHTML=''; for(let i=0;i<15;i++) gGrid.innerHTML+='<div class="tile">?</div>';
         }
-        function openGame(n) { document.getElementById('g-name').innerText=n; document.getElementById('modal-game').style.display='flex'; document.getElementById('engine-sm').style.display=n==='Spaceman'?'block':'none'; document.getElementById('engine-slot').style.display=n!=='Spaceman'?'block':'none'; if(n!=='Spaceman'){ const g=document.getElementById('slot-grid'); g.innerHTML=''; for(let i=0;i<15;i++) g.innerHTML+='<div class="tile">?</div>'; } document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; }
-        
+
+        function openGame(n) { document.getElementById('g-name').innerText=n; document.getElementById('modal-game').style.display='flex'; document.getElementById('engine-sm').style.display=n==='Spaceman'?'block':'none'; document.getElementById('engine-slot').style.display=n!=='Spaceman'?'block':'none'; document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; }
         function playGame() {
             fb.ref('players/'+sess).get().then(s=>{
                 const u=s.val(), b=parseInt(document.getElementById('bet-amt').value); if(u.bal<b) return alert('Saldo Kurang!');
                 fb.ref('players/'+sess).update({bal:u.bal-b});
-                
-                let isWin = false;
-                if(u.r === 'win') isWin = true;
-                else if(u.r === 'loss') isWin = false;
-                // Request Hanin 4: Turunin Normal jadi 2%
-                else if(u.r === 'normal' && Math.random() < 0.02) isWin = true; 
-
-                if(document.getElementById('g-name').innerText==='Spaceman'){
-                    document.getElementById('btn-play').style.display='none'; document.getElementById('btn-cash').style.display='block'; gM=1.0;
-                    let cp = isWin ? (Math.random()*10+5) : 1.05;
-                    gInt=setInterval(()=>{ gM+=0.06; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x'; if(gM>=cp){ clearInterval(gInt); document.getElementById('sm-val').innerText='BOOM!'; setTimeout(()=>openGame('Spaceman'),1500); }},100);
-                } else {
-                    const sym=["💎","⚡","🍒","🔔"]; const g=document.getElementById('slot-grid'); g.innerHTML='';
-                    for(let i=0;i<15;i++){ let sy=sym[Math.floor(Math.random()*4)]; if(isWin && i<3) sy="💎"; g.innerHTML+=`<div class="tile">${sy}</div>`; }
-                    if(isWin){ let win = b*5; fb.ref('players/'+sess).update({bal:(u.bal-b)+win}); document.getElementById('jp-val').innerText = 'Rp ' + win.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; }
-                }
+                const tiles = document.querySelectorAll('.tile'); tiles.forEach(t => t.classList.add('spinning'));
+                setTimeout(() => {
+                    tiles.forEach(t => t.classList.remove('spinning'));
+                    let isWin = u.r === 'win' ? true : (u.r === 'loss' ? false : Math.random() < 0.02); 
+                    if(document.getElementById('g-name').innerText==='Spaceman'){
+                        document.getElementById('btn-play').style.display='none'; document.getElementById('btn-cash').style.display='block'; gM=1.0;
+                        let cp = isWin ? (Math.random()*10+5) : 1.05;
+                        gInt=setInterval(()=>{ gM+=0.06; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x'; if(gM>=cp){ clearInterval(gInt); document.getElementById('sm-val').innerText='BOOM!'; }},100);
+                    } else {
+                        const sym = ["💎","⚡","🍒","🔔","7️⃣"];
+                        tiles.forEach((t, i) => { let s = sym[Math.floor(Math.random()*5)]; if(isWin && i<3) s="💎"; t.innerText = s; });
+                        if(isWin){ let win = b*5; fb.ref('players/'+sess).update({bal:(u.bal-b)+win}); document.getElementById('jp-val').innerText = 'Rp ' + win.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; } else { alert('Belum Beruntung!'); }
+                    }
+                }, 1500);
             });
         }
         function cashSM(){ clearInterval(gInt); fb.ref('players/'+sess).get().then(s=>{ let w=Math.floor(parseInt(document.getElementById('bet-amt').value)*gM); fb.ref('players/'+sess).update({bal:s.val().bal+w}); document.getElementById('jp-val').innerText='Rp '+w.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; }); }
-        function closeJP(){ document.getElementById('jp-anim').style.display='none'; closeGame(); }
         function closeGame(){ clearInterval(gInt); document.getElementById('modal-game').style.display='none'; }
-        
         function openDepo(){ document.getElementById('modal-depo').style.display='flex'; }
         function openWD(){ document.getElementById('modal-wd').style.display='flex'; }
         function submitDepo(){ const a=parseInt(document.getElementById('depo-amt').value); if(a>=10000){ fb.ref('reqs').push({u:sess,a,t:'depo',n:document.getElementById('depo-note').value,s:'pending'}); alert('Laporan Terkirim!'); document.getElementById('modal-depo').style.display='none'; } }
-        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,nm:document.getElementById('wd-name').value,s:'pending'}); alert('Permintaan WD Dikirim!'); document.getElementById('modal-wd').style.display='none'; } }
-        function openHistory(){ document.getElementById('modal-hist').style.display='flex'; fb.ref('reqs').orderByChild('u').equalTo(sess).on('value', s=>{ const hl=document.getElementById('hist-list'); hl.innerHTML=''; s.forEach(c=>{ const r=c.val(); hl.innerHTML+=`<div style="background:#222;padding:10px;border-radius:10px;margin-bottom:5px;font-size:11px;"><b>${r.t.toUpperCase()}</b>: Rp ${r.a.toLocaleString()} | <span style="color:${r.s==='pending'?'#ffb300':'#00e676'}">${r.s.toUpperCase()}</span></div>`; }); }); }
-
-        let lC=0; document.getElementById('logo-trigger').onclick=()=>{ lC++; if(lC>=5){ lC=0; if(prompt('PASS:')==='pepek777'){ document.getElementById('admin-view').style.display='flex'; renderAdm(); }} };
-        function switchAdm(t) { document.getElementById('adm-tab-play').style.display=t==='play'?'block':'none'; document.getElementById('adm-tab-req').style.display=t==='req'?'block':'none'; }
-        function renderAdm(){
-            fb.ref('players').on('value',s=>{ const pb=document.getElementById('adm-p-list'); pb.innerHTML=''; s.forEach(c=>{ const p=c.val(); pb.innerHTML+=`<tr><td>${p.u}</td><td>${p.bal.toLocaleString()}</td><td><button onclick="setR('${p.u}','${p.r}')" style="background:${p.r==='win'?'#00e676':(p.r==='loss'?'#ff1744':'#3b82f6')};color:white;border:none;">${p.r.toUpperCase()}</button></td><td><button onclick="inj('${p.u}')">💉</button></td></tr>`; }); });
-            fb.ref('reqs').on('value',s=>{ const rb=document.getElementById('adm-r-list'); rb.innerHTML=''; s.forEach(c=>{ const r=c.val(); if(r.s==='pending') rb.innerHTML+=`<tr><td>${r.u}</td><td>${r.a}</td><td>${r.t}</td><td><button onclick="appR('${c.key}')">ACC</button></td></tr>`; }); });
-        }
-        function setR(u, cR){ const nR=cR==='win'?'loss':(cR==='loss'?'normal':'win'); fb.ref('players/'+u).update({r:nR}); }
-        function inj(u){ const a=parseInt(prompt('Suntik:')); if(a) fb.ref('players/'+u).get().then(s=>fb.ref('players/'+u).update({bal:s.val().bal+a})); }
-        function appR(k){ fb.ref('reqs/'+k).get().then(s=>{ const r=s.val(); fb.ref('players/'+r.u).get().then(pS=>{ let nB=r.t==='depo'?pS.val().bal+r.a:pS.val().bal-r.a; fb.ref('players/'+r.u).update({bal:nB}); fb.ref('reqs/'+k).update({s:'done'}); }); }); }
+        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,s:'pending'}); alert('Permintaan WD Dikirim!'); document.getElementById('modal-wd').style.display='none'; } }
+        function openHistory(){ document.getElementById('modal-hist').style.display='flex'; fb.ref('reqs').orderByChild('u').equalTo(sess).on('value', s=>{ const hl=document.getElementById('hist-list'); hl.innerHTML=''; s.forEach(c=>{ const r=c.val(); hl.innerHTML+=`<div style="background:#222;padding:12px;border-radius:10px;margin-bottom:8px;font-size:11px;border-left:4px solid var(--blue)"><b>${r.t.toUpperCase()}</b>: Rp ${r.a.toLocaleString()} <br> <span style="color:${r.s==='pending'?'#ffb300':'#00e676'}">${r.s.toUpperCase()}</span></div>`; }); }); }
         function logout(){ localStorage.removeItem('RIZZ_SESS_CLOUD'); location.reload(); }
     </script>
 </body>
-    </html>
-    
+</html>
