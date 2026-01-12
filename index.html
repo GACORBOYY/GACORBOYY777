@@ -3,94 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GACORBOYY - V.85 ULTIMATE</title>
+    <title>GACORBOYY - V.106 POWER</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root { --bg: #0b0e11; --card: #1e2124; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --border: rgba(255,255,255,0.1); --blue: #3b82f6; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0 auto; max-width: 500px; min-height: 100vh; overflow-x: hidden; }
         .view-screen { display: none; width: 100%; height: 100vh; position: fixed; inset: 0; background: var(--bg); z-index: 10; flex-direction: column; overflow-y: auto; }
         .view-active { display: flex !important; }
-        .header { padding: 12px 15px; background: #18191b; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); }
-        .logo-txt { font-size: 1.4rem; font-weight: 900; color: var(--gold); font-style: italic; }
-        .ticker-wrap { background: #000; padding: 8px; overflow: hidden; white-space: nowrap; border-bottom: 1px solid var(--border); }
-        .ticker-move { display: inline-block; animation: ticker 25s linear infinite; font-size: 11px; font-weight: 700; }
+        
+        /* MAINTENANCE SYSTEM */
+        #mt-view { display: none; position: fixed; inset: 0; background: #000; z-index: 20000; align-items: center; justify-content: center; text-align: center; }
+        
+        .header { padding: 15px; background: #18191b; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        
+        /* TICKER POSISI BAWAH */
+        .ticker-wrap { position: fixed; bottom: 65px; left: 0; right: 0; background: rgba(0,0,0,0.95); padding: 10px; overflow: hidden; white-space: nowrap; border-top: 1px solid var(--gold); z-index: 900; max-width: 500px; margin: 0 auto; }
+        .ticker-move { display: inline-block; animation: ticker 25s linear infinite; font-size: 11px; font-weight: 700; color: var(--gold); }
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 120px; }
-        .game-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: center; overflow: hidden; }
-        .slot-wrapper { position: relative; }
+
+        /* 12 GAME GRID */
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; padding-bottom: 140px; }
+        .game-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; overflow: hidden; transition: 0.1s; }
+        .game-card:active { transform: scale(0.95); }
+        .game-icon { font-size: 35px; padding: 15px; background: #222; }
+        .game-title { padding: 8px; font-size: 8px; font-weight: 900; color: #888; }
+        
         .slot-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; background:#000; padding: 10px; border-radius: 15px; border: 2px solid var(--gold); }
-        .tile { aspect-ratio:1/1; background:#111; display:flex; align-items:center; justify-content:center; font-size:1.2rem; border-radius:5px; }
+        .tile { aspect-ratio:1/1; background:#111; display:flex; align-items:center; justify-content:center; font-size:1.4rem; border-radius:5px; border: 1px solid #222; }
         .spinning { animation: blur 0.1s infinite; }
-        @keyframes blur { 0% { filter: blur(0px); } 50% { filter: blur(3px); } 100% { filter: blur(0px); } }
-        #loss-overlay { display: none; position: absolute; inset: 0; background: rgba(255, 23, 68, 0.2); border-radius: 15px; align-items: center; justify-content: center; z-index: 100; animation: flash 0.5s infinite; }
-        @keyframes flash { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; }
-        .btn-gold { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; text-transform: uppercase; }
-        .btn-gold:disabled { background: #444; color: #888; }
+        @keyframes blur { 0%, 100% { filter: blur(0px); } 50% { filter: blur(3px); } }
+        
+        #loss-overlay { display: none; position: absolute; inset: 0; background: rgba(255, 23, 68, 0.3); border-radius: 15px; align-items: center; justify-content: center; z-index: 100; font-weight: 900; }
+        
+        input, select { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; font-weight: 700; }
+        .btn-gold { width: 100%; padding: 16px; background: var(--gold); border-radius: 14px; font-weight: 900; border: none; cursor: pointer; color: #000; text-transform: uppercase; }
         .modal-full { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; overflow-y: auto; }
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: #18191b; display: flex; padding: 15px 0; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-link { flex: 1; text-align: center; color: #888; font-size: 9px; cursor: pointer; font-weight: 700; }
-        .depo-header { background: linear-gradient(to right, #1e2124, #00e676); padding: 15px; display: flex; justify-content: space-between; }
-        .wd-header { background: linear-gradient(to right, #1e2124, #ff1744); padding: 15px; display: flex; justify-content: space-between; }
-        .info-box { background: rgba(59, 130, 246, 0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--blue); text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <script> const NO_DANA = "0812-XXXX-XXXX"; const NM_DANA = "RIZZNESIA OFFICIAL"; </script>
-    <div id="jp-anim" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; align-items:center; justify-content:center; text-align:center;"><div style="padding:40px; border:4px solid var(--gold); border-radius:30px; background:radial-gradient(circle,#443300,#000); box-shadow:0 0 50px var(--gold);"><h1 style="color:var(--gold); font-size:2.5rem;">MEGA JACKPOT!</h1><h2 id="jp-val" style="color:var(--win); font-size:1.8rem;">Rp 0</h2><button class="btn-gold" style="margin-top:20px; width:auto; padding:10px 40px;" onclick="document.getElementById('jp-anim').style.display='none'">AMBIL</button></div></div>
-    <div id="auth-view" class="view-screen view-active"><div style="text-align:center; padding: 40px 20px;"><h1 style="color:var(--gold); font-style:italic; font-size:3rem; margin-bottom: 5px;">GACORBOYY</h1><p style="font-size: 11px; color: var(--gold); font-weight:900; letter-spacing: 2px; margin-bottom: 30px;">PLATFORM JUDI TERPERCAYA</p><div id="login-box" style="background:var(--card); padding:25px; border-radius:20px; border:1px solid var(--border);"><input type="text" id="log-u" placeholder="Username"><input type="password" id="log-p" placeholder="Password"><button class="btn-gold" onclick="handleAuth()">MASUK</button><p onclick="toggleAuth(true)" style="font-size:11px; margin-top:15px; color:#888;">Belum punya ID? <span style="color:var(--gold)">DAFTAR</span></p></div><div id="reg-box" style="display:none; background:var(--card); padding:25px; border-radius:20px; border:1px solid var(--border);"><h3 style="margin-top:0; color:var(--gold);">PENDAFTARAN</h3><input type="text" id="reg-u" placeholder="Buat Username"><input type="password" id="reg-p" placeholder="Buat Password"><select id="reg-bank"><option value="">Pilih Bank / E-Wallet</option><option value="DANA">DANA</option><option value="BCA">BCA</option><option value="BRI">BRI</option></select><input type="text" id="reg-norek" placeholder="Nomor Rekening / HP"><input type="text" id="reg-nmrek" placeholder="Nama Pemilik Rekening"><button class="btn-gold" onclick="handleReg()">DAFTAR SEKARANG</button><p onclick="toggleAuth(false)" style="font-size:11px; margin-top:15px; color:var(--gold); cursor:pointer;">KEMBALI KE LOGIN</p></div></div></div>
-    <div id="main-app" class="view-screen"><header class="header"><div class="logo-txt">GACORBOYY777</div><div style="background:#222; padding:8px 15px; border-radius:20px; border:1px solid var(--blue); font-weight: 900;">Rp <span id="u-bal">0</span></div></header><div class="ticker-wrap"><div class="ticker-move" id="win-tkr"></div></div><div class="game-grid" id="game-list"></div><nav class="footer"><div onclick="location.reload()" class="nav-link">🏠<br>HOME</div><div onclick="openDepo()" class="nav-link">💰<br>DEPO</div><div onclick="openWD()" class="nav-link">💸<br>WD</div><div onclick="openHistory()" class="nav-link">📜<br>HISTORY</div><div onclick="logout()" class="nav-link">👤<br>OUT</div></nav></div>
-    <div id="modal-game" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b id="g-name" style="color:var(--gold);">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:25px;">✕</span></div><div id="engine-sm" style="display:none; text-align:center;"><div style="height:250px; background:radial-gradient(circle at bottom left,#2d005f,#030508); border-radius:20px; margin:15px; position:relative; overflow:hidden;"><div id="rocket-container" style="position:absolute; bottom:5%; left:5%; transition: all 0.1s linear; text-align: center;"><div style="font-size:50px; transform: rotate(45deg);">🚀</div><div id="sm-val" style="font-size:2rem; font-weight:900;">1.00x</div></div></div></div><div id="engine-slot" style="display:none; padding:15px;"><div class="slot-wrapper"><div class="slot-grid" id="slot-grid"></div><div id="loss-overlay"><div style="font-size:40px;">🛑</div><div style="color:#fff; font-weight:900; font-size:1.2rem; text-shadow: 0 0 10px red;">BELUM BERUNTUNG</div></div></div></div><div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">SPIN SEKARANG</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">AMBIL JP</button></div></div>
-    <div id="modal-depo" class="modal-full"><div class="depo-header"><b>DEPOSIT SALDO</b><span onclick="document.getElementById('modal-depo').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><div class="info-box"><small>TRANSFER DANA KE:</small><br><b style="font-size:1.4rem; color:var(--gold);" id="dana-num"></b><br><small id="dana-name"></small></div><input type="number" id="depo-amt" placeholder="Nominal Deposit (Min 10rb)"><input type="text" id="depo-note" placeholder="Nama Pengirim di DANA"><button class="btn-gold" style="background:var(--win); color:#000;" onclick="submitDepo()">SAYA SUDAH TRANSFER</button></div></div>
-    <div id="modal-wd" class="modal-full"><div class="wd-header"><b>PENARIKAN DANA</b><span onclick="document.getElementById('modal-wd').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div style="padding:20px;"><p style="font-size:12px; color:#888;">Isi data rekening tujuan pencairan:</p><select id="wd-bank"><option value="DANA">DANA</option><option value="BCA">BCA</option><option value="BRI">BRI</option></select><input type="text" id="wd-norek" placeholder="Nomor Rekening / HP"><input type="text" id="wd-accname" placeholder="Nama Pemilik Rekening"><input type="number" id="wd-amt" placeholder="Nominal Tarik (Min 50rb)"><button class="btn-gold" style="background:var(--loss); color:#fff;" onclick="submitWD()">AJUKAN PENARIKAN</button></div></div>
-    <div id="modal-hist" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b;"><b>HISTORY</b><span onclick="document.getElementById('modal-hist').style.display='none'" style="cursor:pointer; font-size:25px;">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
+    <div id="mt-view"><div><h1 style="color:var(--gold); font-size:3rem;">🏗️</h1><h2 style="color:white;">MAINTENANCE MODE</h2><p style="color:#666;">Sedang dalam pembaruan server.</p></div></div>
+
+    <div id="jp-anim" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; align-items:center; justify-content:center; text-align:center;"><div style="padding:40px; border:4px solid var(--gold); border-radius:30px; background:radial-gradient(circle,#443300,#000);"><h1 style="color:var(--gold);">BIG WIN!</h1><h2 id="jp-val" style="color:var(--win);">Rp 0</h2><button class="btn-gold" style="width:auto; padding:10px 40px;" onclick="document.getElementById('jp-anim').style.display='none'">AMBIL</button></div></div>
+    
+    <div id="auth-view" class="view-screen view-active"><div style="text-align:center; padding: 40px 20px;"><h1 style="color:var(--gold); font-style:italic; font-size:3.5rem;">GACORBOYY</h1><div id="login-box" style="background:var(--card); padding:25px; border-radius:20px;"><input type="text" id="log-u" placeholder="Username"><input type="password" id="log-p" placeholder="Password"><button class="btn-gold" onclick="handleAuth()">LOGIN</button><p onclick="toggleAuth(true)" style="font-size:11px; margin-top:15px; color:#888;">Belum punya ID? <span style="color:var(--gold); cursor:pointer;">DAFTAR</span></p></div><div id="reg-box" style="display:none; background:var(--card); padding:25px; border-radius:20px;"><input type="text" id="reg-u" placeholder="Username"><input type="password" id="reg-p" placeholder="Password"><select id="reg-bank"><option value="DANA">DANA</option><option value="BCA">BCA</option></select><input type="text" id="reg-norek" placeholder="No Rekening"><input type="text" id="reg-nmrek" placeholder="Nama Pemilik"><button class="btn-gold" onclick="handleReg()">DAFTAR</button><p onclick="toggleAuth(false)" style="font-size:11px; margin-top:15px; color:var(--gold); cursor:pointer;">LOGIN</p></div></div></div>
+
+    <div id="main-app" class="view-screen"><header class="header"><div style="font-weight:900; color:var(--gold); font-style:italic;">G-777</div><div style="background:#222; padding:10px 18px; border-radius:25px; color:var(--win); font-weight:900; border: 1px solid #333;">Rp <span id="u-bal" style="color:#fff">0</span></div></header><div class="game-grid" id="game-list"></div><div class="ticker-wrap"><div class="ticker-move" id="win-tkr"></div></div><nav class="footer"><div onclick="location.reload()" class="nav-link">🏠<br>HOME</div><div onclick="openDepo()" class="nav-link">💰<br>DEPO</div><div onclick="openWD()" class="nav-link">💸<br>WD</div><div onclick="openHist()" class="nav-link">📜<br>HIST</div><div onclick="logout()" class="nav-link">👤<br>OUT</div></nav></div>
+
+    <div id="modal-game" class="modal-full"><div style="padding:15px; display:flex; justify-content:space-between; background:#18191b; border-bottom:1px solid #333;"><b id="g-name" style="color:var(--gold);">GAME</b><span onclick="closeGame()" style="cursor:pointer; font-size:25px;">✕</span></div><div id="engine-sm" style="display:none; text-align:center;"><div style="height:250px; background:radial-gradient(circle at bottom left,#2d005f,#030508); border-radius:20px; margin:15px; position:relative; overflow:hidden;"><div id="rocket-container" style="position:absolute; bottom:5%; left:5%; transition:0.1s linear;"><div style="font-size:50px; transform:rotate(45deg);">🚀</div><div id="sm-val" style="font-size:2rem; font-weight:900; color:var(--gold);">1.00x</div></div></div></div><div id="engine-slot" style="display:none; padding:15px;"><div style="position:relative;"><div class="slot-grid" id="slot-grid"></div><div id="loss-overlay">🛑 RUNGKAT</div></div></div><div style="padding:0 20px;"><input type="number" id="bet-amt" value="5000" style="text-align:center;"><button id="btn-play" class="btn-gold" onclick="playGame()">START SPIN</button><button id="btn-cash" class="btn-gold" style="display:none; background:var(--win)" onclick="cashSM()">CASH OUT</button></div></div>
+
+    <div id="modal-depo" class="modal-full"><div style="background:linear-gradient(to right,#1e2124,var(--win)); padding:20px; display:flex; justify-content:space-between;"><b>DEPOSIT</b><span onclick="document.getElementById('modal-depo').style.display='none'">✕</span></div><div style="padding:20px;"><div style="background:rgba(59,130,246,0.1); padding:20px; border-radius:15px; border:1px solid var(--blue); text-align:center; margin-bottom:20px;"><small>TRANSFER KE:</small><br><b id="dana-num" style="font-size:1.5rem; color:var(--gold);"></b><br><small>A/N: ADMIN GACOR</small></div><input type="number" id="depo-amt" placeholder="Nominal Rp"><input type="text" id="depo-note" placeholder="Nama Pengirim"><button class="btn-gold" style="background:var(--win)" onclick="submitDepo()">KONFIRMASI</button></div></div>
+    <div id="modal-wd" class="modal-full"><div style="background:linear-gradient(to right,#1e2124,var(--loss)); padding:20px; display:flex; justify-content:space-between;"><b>WITHDRAW</b><span onclick="document.getElementById('modal-wd').style.display='none'">✕</span></div><div style="padding:20px;"><select id="wd-bank"><option value="DANA">DANA</option><option value="BCA">BCA</option></select><input type="text" id="wd-norek" placeholder="No Rekening"><input type="text" id="wd-acc" placeholder="Nama Pemilik"><input type="number" id="wd-amt" placeholder="Nominal WD"><button class="btn-gold" style="background:var(--loss); color:#fff" onclick="submitWD()">TARIK</button></div></div>
+    <div id="modal-hist" class="modal-full"><div style="padding:15px; background:#18191b; display:flex; justify-content:space-between;"><b>HISTORY</b><span onclick="document.getElementById('modal-hist').style.display='none'">✕</span></div><div id="hist-list" style="padding:15px;"></div></div>
+
     <script>
         const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const fb = firebase.database(); let sess = localStorage.getItem('RIZZ_SESS_CLOUD'), gInt, gM = 1.0, isCrashed = false;
-        document.getElementById('dana-num').innerText = NO_DANA; document.getElementById('dana-name').innerText = "A/N: " + NM_DANA;
-        const nms = ["Suryadi", "Nurul_H", "Budi_S", "Agus_K", "Putri_R", "Siti_A", "Kevin_W", "Eko_P", "Dewi_S"];
-        const tkr = document.getElementById('win-tkr'); for(let i=0; i<25; i++) { tkr.innerHTML += ` 🔥 ${nms[Math.floor(Math.random()*nms.length)]} JP <span style="color:var(--win)">Rp ${(Math.random()*60 + 5).toFixed(1)}jt</span> • `; }
-        function addLog(t, a, b) { fb.ref('logs/' + sess).push({ t, a, b, time: Date.now() }); }
+
+        /* SYNC SETTINGS & TICKER */
+        fb.ref('settings').on('value', s => {
+            const d = s.val(); if(d) {
+                if(document.getElementById('dana-num')) document.getElementById('dana-num').innerText = d.dana;
+                const tkr = document.getElementById('win-tkr');
+                if(d.ticker) { tkr.innerText = d.ticker; }
+                else { const nms = ["Rian", "Dewi", "Budi", "Siska", "Eko"]; tkr.innerHTML = "";
+                       for(let i=0; i<15; i++) tkr.innerHTML += ` 🔥 ${nms[Math.floor(Math.random()*5)]} JP x${(Math.random()*50).toFixed(0)} Rp ${(Math.random()*10).toFixed(1)}jt • `;
+                }
+                document.getElementById('mt-view').style.display = d.mt ? 'flex' : 'none';
+            }
+        });
+
         function toggleAuth(r) { document.getElementById('login-box').style.display = r?'none':'block'; document.getElementById('reg-box').style.display = r?'block':'none'; }
-        function handleReg() { const u = document.getElementById('reg-u').value.toLowerCase(), p = document.getElementById('reg-p').value, b = document.getElementById('reg-bank').value, nr = document.getElementById('reg-norek').value, nm = document.getElementById('reg-nmrek').value; if(u&&p&&b&&nr&&nm) fb.ref('players/'+u).set({u,p,bal:0,r:'normal',bank:b,norek:nr,namarek:nm}).then(()=>toggleAuth(false)); else alert("Lengkapi data!"); }
-        function handleAuth() { const u = document.getElementById('log-u').value.toLowerCase(), p = document.getElementById('log-p').value; fb.ref('players/'+u).get().then(s=>{ const d=s.val(); if(d&&d.p===p){sess=u; localStorage.setItem('RIZZ_SESS_CLOUD',u); location.reload();} }); }
-        if(sess) { document.getElementById('auth-view').classList.remove('view-active'); document.getElementById('main-app').classList.add('view-active'); fb.ref('players/'+sess).on('value', s=>{ if(s.val()) document.getElementById('u-bal').innerText = Number(s.val().bal).toLocaleString(); }); renderLobby(); }
-        function renderLobby() {
-            const gs = [{n:'Spaceman',i:'🚀'},{n:'Gates Zeus',i:'⚡'},{n:'Mahjong Ways',i:'🀄'},{n:'Sugar Rush',i:'🍭'},{n:'Sweet Bonanza',i:'🍬'},{n:'Princess',i:'⭐'},{n:'West Gold',i:'🤠'},{n:'Aztec Gems',i:'💎'},{n:'Power Thor',i:'🔨'}];
-            const m = document.getElementById('game-list'); m.innerHTML = ''; gs.forEach(g=>{ m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><div style="font-size:40px; padding:20px; background:#222;">${g.i}</div><div style="padding:8px;font-size:9px;font-weight:900;">${g.n.toUpperCase()}</div></div>`; });
+        function handleReg() { const u = document.getElementById('reg-u').value.toLowerCase(), p = document.getElementById('reg-p').value, b = document.getElementById('reg-bank').value, nr = document.getElementById('reg-norek').value, nm = document.getElementById('reg-nmrek').value; if(u&&p&&b&&nr&&nm) fb.ref('players/'+u).set({u,p,bal:0,r:'normal',status:'active',bank:b,norek:nr,namarek:nm}).then(()=>toggleAuth(false)); else alert("Data Belum Lengkap!"); }
+        function handleAuth() { const u = document.getElementById('log-u').value.toLowerCase(), p = document.getElementById('log-p').value; fb.ref('players/'+u).get().then(s=>{ const d=s.val(); if(d && d.status==='ban') return alert('BANNED!'); if(d && d.p===p){sess=u; localStorage.setItem('RIZZ_SESS_CLOUD',u); location.reload();} else alert('Salah!'); }); }
+        
+        if(sess) {
+            document.getElementById('auth-view').classList.remove('view-active'); document.getElementById('main-app').classList.add('view-active');
+            fb.ref('players/'+sess).on('value', s=>{ if(s.val()) document.getElementById('u-bal').innerText = Number(s.val().bal).toLocaleString(); });
+            /* 12 GAMES LIST */
+            const gs = [{n:'Spaceman',i:'🚀'},{n:'Gates Zeus',i:'⚡'},{n:'Mahjong Ways',i:'🀄'},{n:'Koi Gate',i:'🐟'},{n:'Starlight',i:'⭐'},{n:'Bonanza',i:'🍬'},{n:'Sugar Rush',i:'🍭'},{n:'Lucky Neko',i:'🐱'},{n:'Wild West',i:'🤠'},{n:'Aztec Gems',i:'💎'},{n:'Fruit Party',i:'🍎'},{n:'Joker Jewel',i:'🤡'}];
+            const m = document.getElementById('game-list'); m.innerHTML = ''; gs.forEach(g=>{ m.innerHTML += `<div class="game-card" onclick="openGame('${g.n}')"><div class="game-icon">${g.i}</div><div class="game-title">${g.n.toUpperCase()}</div></div>`; });
             const gGrid = document.getElementById('slot-grid'); gGrid.innerHTML=''; for(let i=0;i<15;i++) gGrid.innerHTML+='<div class="tile">?</div>';
         }
-        function openGame(n) { document.getElementById('g-name').innerText=n.toUpperCase(); document.getElementById('modal-game').style.display='flex'; document.getElementById('engine-sm').style.display=n==='Spaceman'?'block':'none'; document.getElementById('engine-slot').style.display=n!=='Spaceman'?'block':'none'; document.getElementById('btn-play').style.display='block'; document.getElementById('btn-cash').style.display='none'; document.getElementById('sm-val').innerText='1.00x'; document.getElementById('rocket-container').style.bottom='5%'; document.getElementById('rocket-container').style.left='5%'; gM=1.0; isCrashed=false; }
+
+        function openGame(n) { 
+            const playBtn = document.getElementById('btn-play');
+            document.getElementById('g-name').innerText=n.toUpperCase(); 
+            document.getElementById('modal-game').style.display='flex'; 
+            if(n==='Spaceman'){
+                document.getElementById('engine-sm').style.display='block';
+                document.getElementById('engine-slot').style.display='none';
+                playBtn.innerText = "MULAI TERBANG"; //
+            } else {
+                document.getElementById('engine-sm').style.display='none';
+                document.getElementById('engine-slot').style.display='block';
+                playBtn.innerText = "START SPIN";
+            }
+            gM=1.0; isCrashed=false; 
+        }
+
+        /* LOGIKA MULTIPLIER x2 - x100 */
+        function getWeightMultiplier() {
+            let r = Math.random() * 1000;
+            if(r < 1.5) return 100; if(r < 10) return 50; if(r < 30) return 20; if(r < 70) return 10; if(r < 300) return 4; if(r < 600) return 2; return 0;
+        }
+
         function playGame() {
             fb.ref('players/'+sess).get().then(s=>{
                 const u=s.val(), b=parseInt(document.getElementById('bet-amt').value); if(u.bal<b) return alert('Saldo Kurang!');
-                const btn = document.getElementById('btn-play'); btn.disabled = true;
-                const newB = u.bal - b; fb.ref('players/'+sess).update({bal: newB}); addLog('BET', b, newB);
-                const tiles = document.querySelectorAll('.tile'); tiles.forEach(t => t.classList.add('spinning'));
-                setTimeout(() => {
-                    tiles.forEach(t => t.classList.remove('spinning')); let isWin = u.r==='win' ? true : (u.r==='loss' ? false : Math.random()<0.02);
-                    if(document.getElementById('g-name').innerText==='SPACEMAN'){
-                        document.getElementById('btn-cash').style.display='block'; gM=1.0; isCrashed=false; let cp = isWin ? (Math.random()*8+4) : (Math.random()*0.5 + 1.1);
-                        gInt=setInterval(()=>{ gM += 0.07; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x'; let p = (gM - 1) * 8 + 5; if(p > 85) p = 85; document.getElementById('rocket-container').style.bottom = p + '%'; document.getElementById('rocket-container').style.left = p + '%';
-                        if(gM >= cp){ clearInterval(gInt); isCrashed = true; document.getElementById('sm-val').innerText='BOOM!'; setTimeout(()=> { btn.disabled = false; closeGame(); }, 2000); }}, 100);
-                    } else {
-                        btn.disabled = false; const sym = ["💎","⚡","🍒","🔔","7️⃣"]; tiles.forEach((t, i) => { let sy = sym[Math.floor(Math.random()*5)]; if(isWin && i<3) sy="💎"; t.innerText = sy; });
-                        if(isWin){ let win = b*10; let fBal = newB+win; fb.ref('players/'+sess).update({bal:fBal}); addLog('WIN', win, fBal); document.getElementById('jp-val').innerText = 'Rp ' + win.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; } 
-                        else { const ov = document.getElementById('loss-overlay'); ov.style.display = 'flex'; setTimeout(() => ov.style.display = 'none', 2000); }
-                    }
-                }, 1500);
+                const btn = document.getElementById('btn-play'); btn.disabled = true; const newB = u.bal - b; fb.ref('players/'+sess).update({bal: newB}); 
+                fb.ref('logs/'+sess).push({t:'BET', a:b, b:newB, time: Date.now()});
+                
+                /* BOOSTER NORMAL 8% (Total Prob 13%) */
+                let winProb = 0.05 + 0.08; 
+                let isWin = u.r==='win' ? true : (u.r==='loss' ? false : Math.random() < winProb);
+
+                if(document.getElementById('g-name').innerText==='SPACEMAN'){
+                    document.getElementById('btn-cash').style.display='block'; gM=1.0; isCrashed=false; 
+                    let cp = isWin ? (Math.random()*6+4) : (Math.random()*0.5 + 1.1);
+                    gInt=setInterval(()=>{ 
+                        gM += 0.08; document.getElementById('sm-val').innerText=gM.toFixed(2)+'x'; 
+                        let p = (gM-1)*10+5; if(p>85)p=85; document.getElementById('rocket-container').style.bottom=p+'%'; document.getElementById('rocket-container').style.left=p+'%';
+                        if(gM >= cp){ crashGame(); }
+                    }, 100);
+                } else {
+                    const tiles = document.querySelectorAll('.tile'); tiles.forEach(t => t.classList.add('spinning'));
+                    setTimeout(() => {
+                        tiles.forEach(t => t.classList.remove('spinning')); 
+                        btn.disabled = false;
+                        let mult = (u.r==='win') ? 10 : (u.r==='loss' ? 0 : getWeightMultiplier());
+                        if(mult > 0){
+                            let win = b * mult; let fBal = newB + win; fb.ref('players/'+sess).update({bal:fBal});
+                            document.getElementById('jp-val').innerText='JACKPOT x'+mult+'\nRp '+win.toLocaleString(); document.getElementById('jp-anim').style.display='flex';
+                        } else {
+                            document.getElementById('loss-overlay').style.display='flex'; setTimeout(()=>document.getElementById('loss-overlay').style.display='none', 1500);
+                        }
+                    }, 1500);
+                }
             });
         }
-        function cashSM(){ if(isCrashed) return; clearInterval(gInt); fb.ref('players/'+sess).get().then(s=>{ let w = Math.floor(parseInt(document.getElementById('bet-amt').value) * gM); let fBal = s.val().bal+w; fb.ref('players/'+sess).update({bal: fBal}); addLog('WIN-SM', w, fBal); document.getElementById('jp-val').innerText = 'Rp ' + w.toLocaleString(); document.getElementById('jp-anim').style.display = 'flex'; document.getElementById('btn-play').disabled = false; document.getElementById('btn-cash').style.display = 'none'; }); }
+
+        /* FIX CASH OUT */
+        function cashSM(){ 
+            if(isCrashed || !gInt) return; 
+            clearInterval(gInt); gInt = null;
+            fb.ref('players/'+sess).get().then(s=>{ 
+                let w = Math.floor(parseInt(document.getElementById('bet-amt').value)*gM); 
+                let fBal = s.val().bal+w; fb.ref('players/'+sess).update({bal:fBal}); 
+                document.getElementById('jp-val').innerText='Rp '+w.toLocaleString(); document.getElementById('jp-anim').style.display='flex'; 
+                document.getElementById('btn-play').disabled=false; document.getElementById('btn-cash').style.display='none'; 
+            }); 
+        }
+
+        function crashGame() { clearInterval(gInt); gInt = null; isCrashed = true; document.getElementById('sm-val').innerText='BOOM!'; document.getElementById('btn-play').disabled=false; document.getElementById('btn-cash').style.display='none'; }
         function openDepo(){ document.getElementById('modal-depo').style.display='flex'; }
         function openWD(){ document.getElementById('modal-wd').style.display='flex'; }
+        function openHist(){ document.getElementById('modal-hist').style.display='flex'; fb.ref('reqs').orderByChild('u').equalTo(sess).on('value', s=>{ const hl=document.getElementById('hist-list'); hl.innerHTML=''; s.forEach(c=>{ const r=c.val(); hl.innerHTML+=`<div style="background:#222;padding:12px;border-radius:10px;margin-bottom:8px;font-size:11px;border-left:4px solid var(--blue)"><b>${r.t.toUpperCase()}</b>: Rp ${r.a.toLocaleString()} | ${r.s.toUpperCase()}</div>`; }); }); }
         function submitDepo(){ const a=parseInt(document.getElementById('depo-amt').value); if(a>=10000){ fb.ref('reqs').push({u:sess,a,t:'depo',n:document.getElementById('depo-note').value,s:'pending'}); alert('Laporan Dikirim!'); document.getElementById('modal-depo').style.display='none'; } }
-        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,an:document.getElementById('wd-accname').value,s:'pending'}); alert('WD Dikirim!'); document.getElementById('modal-wd').style.display='none'; } }
-        function openHistory(){ document.getElementById('modal-hist').style.display='flex'; fb.ref('reqs').orderByChild('u').equalTo(sess).on('value', s=>{ const hl=document.getElementById('hist-list'); hl.innerHTML=''; s.forEach(c=>{ const r=c.val(); hl.innerHTML+=`<div style="background:#222;padding:12px;border-radius:10px;margin-bottom:8px;font-size:11px;border-left:4px solid var(--blue)"><b>${r.t.toUpperCase()}</b>: Rp ${r.a.toLocaleString()} | ${r.s.toUpperCase()}</div>`; }); }); }
-        function closeGame(){ clearInterval(gInt); document.getElementById('modal-game').style.display='none'; document.getElementById('btn-play').disabled = false; }
+        function submitWD(){ const a=parseInt(document.getElementById('wd-amt').value); if(a>=50000){ fb.ref('reqs').push({u:sess,a,t:'wd',b:document.getElementById('wd-bank').value,nr:document.getElementById('wd-norek').value,an:document.getElementById('wd-acc').value,s:'pending'}); alert('WD Dikirim!'); document.getElementById('modal-wd').style.display='none'; } }
+        function closeGame(){ if(gInt) clearInterval(gInt); document.getElementById('modal-game').style.display='none'; document.getElementById('btn-play').disabled=false; }
         function logout(){ localStorage.removeItem('RIZZ_SESS_CLOUD'); location.reload(); }
     </script>
 </body>
