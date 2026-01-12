@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GACORBOYY - ADMIN PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg: #0b1118; --card: #1c222d; --gold: #ffb300; --win: #00e676; --loss: #ff1744; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h2 { color: var(--gold); border-bottom: 2px solid #333; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
+        th { background: #161b22; color: var(--gold); }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; margin-right: 5px; }
+        .btn-status { color: white; min-width: 80px; }
+        input[type="password"] { padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; width: 250px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div id="lock" style="text-align:center; padding-top:100px;">
+        <h1 style="color:var(--gold); font-style:italic;">ADMIN DASHBOARD</h1>
+        <p style="color:#888;">Silakan masukkan password rahasia</p>
+        <input type="password" id="pass" placeholder="Password Panel"><br>
+        <button onclick="unlock()" style="background:var(--gold); padding:12px 30px; border-radius:8px;">MASUK PANEL</button>
+    </div>
+
+    <div id="content" style="display:none;" class="container">
+        <h2>📊 MONITOR PEMAIN</h2>
+        <table>
+            <thead><tr><th>USERNAME</th><th>SALDO</th><th>STATUS (KLIK GANTI)</th><th>AKSI</th></tr></thead>
+            <tbody id="p-list"></tbody>
+        </table>
+
+        <h2>💸 REQUEST DEPO/WD</h2>
+        <table>
+            <thead><tr><th>USER</th><th>NOMINAL</th><th>TIPE</th><th>AKSI</th></tr></thead>
+            <tbody id="r-list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(config); const fb = firebase.database();
+
+        function unlock() {
+            // Password baru sesuai request Hanin: kairi777
+            if(document.getElementById('pass').value === 'kairi777') {
+                document.getElementById('lock').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                render();
+            } else { alert("Password Salah!"); }
+        }
+
+        function render() {
+            fb.ref('players').on('value', s => {
+                const list = document.getElementById('p-list'); list.innerHTML = '';
+                s.forEach(c => {
+                    const p = c.val();
+                    let color = p.r === 'win' ? '#00e676' : (p.r === 'loss' ? '#ff1744' : '#3b82f6');
+                    list.innerHTML += `<tr>
+                        <td>${p.u}</td>
+                        <td>Rp ${p.bal.toLocaleString()}</td>
+                        <td><button onclick="setNasib('${p.u}','${p.r}')" class="btn-status" style="background:${color}">${p.r.toUpperCase()}</button></td>
+                        <td><button onclick="suntik('${p.u}')" style="background:#444; color:white;">💉 SUNTIK</button></td>
+                    </tr>`;
+                });
+            });
+            fb.ref('reqs').on('value', s => {
+                const list = document.getElementById('r-list'); list.innerHTML = '';
+                s.forEach(c => {
+                    const r = c.val();
+                    if(r.s === 'pending') {
+                        list.innerHTML += `<tr>
+                            <td>${r.u}</td>
+                            <td>Rp ${r.a.toLocaleString()}</td>
+                            <td>${r.t.toUpperCase()}</td>
+                            <td><button onclick="acc('${c.key}')" style="background:#00e676">ACC</button></td>
+                        </tr>`;
+                    }
+                });
+            });
+        }
+
+        function setNasib(u, cR) { 
+            const nR = cR==='win' ? 'loss' : (cR==='loss' ? 'normal' : 'win'); 
+            fb.ref('players/'+u).update({r: nR}); 
+        }
+        function suntik(u) { 
+            const a = parseInt(prompt('Berapa saldo yang mau di-inject ke ' + u + '?')); 
+            if(a) fb.ref('players/'+u).get().then(s => fb.ref('players/'+u).update({bal: s.val().bal + a})); 
+        }
+        function acc(k) {
+            fb.ref('reqs/'+k).get().then(s => {
+                const r = s.val(); fb.ref('players/'+r.u).get().then(pS => {
+                    let nB = r.t==='depo' ? pS.val().bal+r.a : pS.val().bal-r.a;
+                    fb.ref('players/'+r.u).update({bal: nB}); fb.ref('reqs/'+k).update({s: 'done'});
+                });
+            });
+        }
+    </script>
+</body>
+</html>
