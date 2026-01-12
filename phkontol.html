@@ -2,61 +2,96 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GACORBOYY - ADMIN PANEL V.85</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GACORBOYY ADMIN - V.98 FULL LOGS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b1118; --card: #1c222d; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --blue: #3b82f6; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        :root { --bg: #06090c; --side: #0e1217; --card: #161b22; --gold: #ffb300; --win: #00e676; --loss: #ff1744; --blue: #3b82f6; --text: #e1e1e1; }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; user-select: none; }
         
-        /* UI LOGIN RAPI */
-        #lock { background: var(--card); padding: 40px; border-radius: 20px; border: 2px solid var(--gold); text-align: center; box-shadow: 0 0 30px rgba(255, 179, 0, 0.2); width: 100%; max-width: 400px; }
-        #lock h2 { color: var(--gold); margin-bottom: 30px; font-style: italic; text-transform: uppercase; }
-        #lock input { padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; width: 100%; margin-bottom: 20px; font-size: 16px; box-sizing: border-box; }
-        #lock button { width: 100%; padding: 15px; background: var(--gold); border-radius: 12px; font-weight: 900; border: none; cursor: pointer; color: #000; font-size: 16px; }
+        /* SIDEBAR DRAGGABLE */
+        .sidebar { width: 180px; min-width: 50px; max-width: 80vw; background: var(--side); display: flex; flex-direction: column; height: 100%; flex-shrink: 0; position: relative; overflow: hidden; border-right: 1px solid #222; }
+        .sidebar-brand { padding: 20px 10px; font-weight: 900; color: var(--gold); font-size: 1rem; text-align: center; border-bottom: 1px solid #222; }
+        .resizer { width: 10px; cursor: col-resize; background: transparent; height: 100%; z-index: 100; flex-shrink: 0; border-left: 2px solid #333; }
+        .resizer:active { border-left: 2px solid var(--gold); }
 
-        #content { display:none; width: 100%; max-width: 1000px; align-self: flex-start; margin-top: 20px; }
-        h2 { color: var(--gold); border-left: 5px solid var(--gold); padding-left: 15px; margin-top: 40px; text-transform: uppercase; font-size: 1.2rem; }
-        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
-        th { background: #161b22; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { padding: 15px; cursor: pointer; color: #888; font-weight: 600; font-size: 12px; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .nav-active { background: #1c222d; color: var(--gold); border-left: 3px solid var(--gold); }
         
-        .btn-action { cursor: pointer; padding: 8px 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 10px; text-transform: uppercase; transition: 0.2s; }
-        .btn-action:hover { opacity: 0.8; transform: translateY(-2px); }
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg); user-select: auto; }
         
-        /* MODAL LOG SALDO */
-        #log-view { display:none; position:fixed; inset:30px; background:rgba(0,0,0,0.95); border: 2px solid var(--gold); overflow-y:auto; padding:30px; z-index:1000; border-radius: 20px; box-shadow: 0 0 50px #000; }
-        .close-log { float: right; background: var(--loss); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 900; }
+        /* DASHBOARD RECAP */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #333; }
+        .card h2 { margin: 10px 0 0; font-size: 1.5rem; font-weight: 900; }
+
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; font-size: 11px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
+        th { background: #000; color: var(--gold); }
+        
+        .btn { padding: 8px 12px; border-radius: 6px; border: none; font-weight: 800; cursor: pointer; font-size: 9px; }
+        
+        /* LOG MODAL */
+        #log-modal { display:none; position:fixed; inset:20px; background:rgba(0,0,0,0.98); border: 2px solid var(--gold); border-radius: 20px; z-index: 10001; padding:20px; overflow-y:auto; }
+        
+        #login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .section { display: none; } .active-sec { display: block; }
     </style>
 </head>
 <body>
-    <div id="lock">
-        <h2>Admin GacorBoyy</h2>
-        <input type="password" id="pass" placeholder="Password Panel">
-        <button onclick="unlock()">MASUK SEKARANG</button>
-    </div>
-
-    <div id="content">
-        <h2>📊 MONITOR PEMAIN & LOGS</h2>
-        <table>
-            <thead><tr><th>USER</th><th>SALDO</th><th>SET NASIB</th><th>LOG SALDO</th><th>AKSI SUNTIK</th></tr></thead>
-            <tbody id="p-list"></tbody>
-        </table>
-
-        <h2>💸 PERMINTAAN DEPO / WD (PENDING)</h2>
-        <table>
-            <thead><tr><th>PEMAIN</th><th>TIPE</th><th>NOMINAL</th><th>DETAIL REKENING</th><th>KONFIRMASI</th></tr></thead>
-            <tbody id="r-list"></tbody>
-        </table>
-    </div>
-
-    <div id="log-view">
-        <button class="close-log" onclick="document.getElementById('log-view').style.display='none'">TUTUP LOG</button>
-        <h3 id="log-user" style="color:var(--gold); font-size: 1.5rem; margin-top: 0;">LOG USER: </h3>
+    <div id="login-overlay"><div style="background:var(--card); padding:40px; border-radius:25px; border:2px solid var(--gold); text-align:center;"><h2 style="color:var(--gold); font-style:italic;">SUPREME PRO</h2><input type="password" id="adm-pass" placeholder="Password" style="text-align:center;"><br><button onclick="unlock()" class="btn" style="background:var(--gold); width:100%; padding:15px;">LOGIN</button></div></div>
+    
+    <div id="log-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 id="log-user" style="color:var(--gold); margin:0;">LOG SALDO USER</h3>
+            <button onclick="document.getElementById('log-modal').style.display='none'" class="btn" style="background:var(--loss); color:white;">TUTUP</button>
+        </div>
         <table>
             <thead><tr><th>WAKTU</th><th>AKSI</th><th>NOMINAL</th><th>SALDO AKHIR</th></tr></thead>
             <tbody id="log-list"></tbody>
         </table>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">G-777 PRO</div>
+        <div class="nav-item nav-active" onclick="showSec('dash', this)">🏠 DASHBOARD</div>
+        <div class="nav-item" onclick="showSec('players', this)">👥 PEMAIN</div>
+        <div class="nav-item" onclick="showSec('reqs', this)">⏳ REQUEST</div>
+        <div class="nav-item" onclick="showSec('settings', this)">⚙️ SETTING</div>
+    </div>
+
+    <div class="resizer" id="resizer"></div>
+
+    <div class="main-content">
+        <div id="sec-dash" class="section active-sec">
+            <h1 style="font-size:1.5rem;">Analytics Recap</h1>
+            <div class="dash-grid">
+                <div class="card"><small>Profit (Hitung Manual)</small><h2 id="st-profit" style="color:var(--win);">Rp 0</h2></div>
+                <div class="card"><small>Total Pemain</small><h2 id="st-players">0</h2></div>
+                <div class="card"><small>Saldo Beredar</small><h2 id="st-balance" style="color:var(--blue);">Rp 0</h2></div>
+            </div>
+        </div>
+
+        <div id="sec-players" class="section">
+            <h2>Manajemen Pemain</h2>
+            <input type="text" id="p-search" placeholder="Cari username..." oninput="renderPlayersSync()">
+            <table>
+                <thead><tr><th>USER</th><th>SALDO</th><th>NASIB</th><th>AKSI</th></tr></thead>
+                <tbody id="p-list"></tbody>
+            </table>
+        </div>
+
+        <div id="sec-reqs" class="section"><h2>Pending Requests</h2><table><tbody id="r-list"></tbody></table></div>
+        <div id="sec-settings" class="section">
+            <h2>Settings</h2>
+            <div class="card" style="max-width:500px;">
+                <label><small>DANA ADMIN</small></label><input type="text" id="set-dana">
+                <label><small>RUNNING TEXT</small></label><input type="text" id="set-ticker">
+                <button onclick="saveSettings()" class="btn" style="background:var(--win); width:100%; padding:15px;">SAVE DATA</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -64,55 +99,60 @@
     <script>
         const config = { apiKey: "AIzaSyBO9wgYm6lIz9YzO8OpyuSJLqLvnI_XZVE", databaseURL: "https://gacorboy7777-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const fb = firebase.database();
+        let pData = [];
 
-        function unlock() {
-            // Password baru lo: kairi777
-            if(document.getElementById('pass').value === 'kairi777') {
-                document.getElementById('lock').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                document.body.style.alignItems = 'flex-start';
-                render();
-            } else { alert("Password Salah!"); }
-        }
+        // SIDEBAR DRAG
+        const sidebar = document.getElementById("sidebar"), resizer = document.getElementById("resizer");
+        const startResize = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const handleMove = (mv) => { const x = mv.touches ? mv.touches[0].clientX : mv.clientX; if(x > 50 && x < 400) sidebar.style.width = x + "px"; };
+            const stop = () => { document.removeEventListener("touchmove", handleMove); document.removeEventListener("mousemove", handleMove); };
+            document.addEventListener("touchmove", handleMove); document.addEventListener("mousemove", handleMove);
+            document.addEventListener("touchend", stop); document.addEventListener("mouseup", stop);
+        };
+        resizer.addEventListener("touchstart", startResize); resizer.addEventListener("mousedown", startResize);
 
-        function render() {
-            // RENDER LIST PEMAIN
+        function unlock() { if(document.getElementById('adm-pass').value==='kairi777'){document.getElementById('login-overlay').style.display='none'; init();} else alert('Salah!'); }
+        function showSec(id, el) { document.querySelectorAll('.section').forEach(s=>s.classList.remove('active-sec')); document.getElementById('sec-'+id).classList.add('active-sec'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('nav-active')); el.classList.add('nav-active'); }
+
+        function init() {
+            // RECAP PROFIT
+            fb.ref('reqs').on('value', s => {
+                let p = 0; s.forEach(c => { const r = c.val(); if(r.s==='done'){ if(r.t==='depo') p += Number(r.a); else p -= Number(r.a); } });
+                document.getElementById('st-profit').innerText = "Rp " + p.toLocaleString();
+                renderReqs(s);
+            });
             fb.ref('players').on('value', s => {
-                const list = document.getElementById('p-list'); list.innerHTML = '';
-                s.forEach(c => {
-                    const p = c.val();
-                    let nColor = p.r === 'win' ? 'var(--win)' : (p.r === 'loss' ? 'var(--loss)' : '#555');
-                    list.innerHTML += `<tr>
-                        <td><b>${p.u}</b></td>
-                        <td style="color:var(--blue); font-weight:bold;">Rp ${p.bal.toLocaleString()}</td>
-                        <td><button class="btn-action" style="background:${nColor}; color:#000;" onclick="setNasib('${p.u}','${p.r}')">${p.r.toUpperCase()}</button></td>
-                        <td><button class="btn-action" style="background:var(--gold); color:#000;" onclick="showLogs('${p.u}')">LIHAT LOG</button></td>
-                        <td><button class="btn-action" style="background:var(--blue); color:#fff;" onclick="suntik('${p.u}')">💉 SUNTIK</button></td>
-                    </tr>`;
-                });
+                let bal = 0, count = 0; pData = [];
+                s.forEach(c => { const d = c.val(); bal += Number(d.bal); count++; pData.push(d); });
+                document.getElementById('st-balance').innerText = "Rp " + bal.toLocaleString();
+                document.getElementById('st-players').innerText = count;
+                renderPlayersSync();
             });
-
-            // RENDER LIST ACC REQUEST
-            fb.ref('reqs').orderByChild('s').equalTo('pending').on('value', s => {
-                const rList = document.getElementById('r-list'); rList.innerHTML = '';
-                s.forEach(c => {
-                    const r = c.val();
-                    let detail = r.t === 'depo' ? "Laporan Deposit" : `${r.b} | ${r.nr} | a/n ${r.an || 'User'}`;
-                    rList.innerHTML += `<tr>
-                        <td>${r.u}</td>
-                        <td style="color:${r.t==='depo'?'var(--win)':'var(--loss)'}; font-weight:bold;">${r.t.toUpperCase()}</td>
-                        <td>Rp ${r.a.toLocaleString()}</td>
-                        <td style="font-size:11px;">${detail}</td>
-                        <td><button class="btn-action" style="background:var(--win); color:#000;" onclick="acc('${c.key}')">✅ ACC</button></td>
-                    </tr>`;
-                });
-            });
+            fb.ref('settings').once('value', s => { const d = s.val(); if(d) { document.getElementById('set-dana').value = d.dana; document.getElementById('set-ticker').value = d.ticker; } });
         }
 
-        // FUNGSI LIHAT LOG PERPUTARAN
+        function renderPlayersSync() {
+            const list = document.getElementById('p-list'), q = document.getElementById('p-search').value.toLowerCase();
+            list.innerHTML = '';
+            pData.forEach(p => { if(p.u.includes(q)) {
+                list.innerHTML += `<tr>
+                    <td><b>${p.u.toUpperCase()}</b></td>
+                    <td style="color:var(--blue)">Rp ${p.bal.toLocaleString()}</td>
+                    <td><button class="btn" style="background:#333;color:#fff" onclick="setNasib('${p.u}','${p.r}')">${p.r[0].toUpperCase()}</button></td>
+                    <td>
+                        <button class="btn" style="background:var(--gold); color:#000;" onclick="showLogs('${p.u}')">LOG</button>
+                        <button class="btn" style="background:var(--blue); color:#fff;" onclick="suntik('${p.u}')">💉</button>
+                    </td>
+                    <td><button class="btn" style="background:${p.status==='ban'?'var(--win)':'var(--loss)'};" onclick="ban('${p.u}','${p.status}')">${p.status==='ban'?'UN':'BAN'}</button></td>
+                </tr>`;
+            }});
+        }
+
+        // FUNGSI LIHAT LOG SALDO
         function showLogs(u) {
-            document.getElementById('log-view').style.display = 'block';
-            document.getElementById('log-user').innerText = "LOG USER: " + u;
+            document.getElementById('log-modal').style.display = 'block';
+            document.getElementById('log-user').innerText = "LOG USER: " + u.toUpperCase();
             fb.ref('logs/' + u).limitToLast(50).on('value', s => {
                 const lList = document.getElementById('log-list'); lList.innerHTML = '';
                 s.forEach(c => {
@@ -120,37 +160,33 @@
                     lList.innerHTML += `<tr>
                         <td>${d}</td>
                         <td style="color:${l.t.includes('WIN')?'var(--win)':'var(--loss)'}; font-weight:bold;">${l.t}</td>
-                        <td>Rp ${l.a.toLocaleString()}</td>
-                        <td><b>Rp ${l.b.toLocaleString()}</b></td>
+                        <td>Rp ${Number(l.a).toLocaleString()}</td>
+                        <td><b>Rp ${Number(l.b).toLocaleString()}</b></td>
                     </tr>`;
                 });
             });
         }
 
-        // FUNGSI ACC TRANSAKSI
-        function acc(k) {
-            if(confirm('ACC Transaksi ini? Saldo pemain akan otomatis berubah.')) {
-                fb.ref('reqs/'+k).get().then(s => {
-                    const r = s.val(); fb.ref('players/'+r.u).get().then(pS => {
-                        let newBal = r.t==='depo' ? pS.val().bal+r.a : pS.val().bal-r.a;
-                        if(newBal < 0) return alert('Saldo tidak cukup untuk WD!');
-                        fb.ref('players/'+r.u).update({bal: newBal});
-                        fb.ref('reqs/'+k).update({s: 'done'});
-                        // Kirim Log
-                        fb.ref('logs/'+r.u).push({ t:'ADMIN-'+r.t.toUpperCase(), a:r.a, b:newBal, time: Date.now() });
-                    });
-                });
-            }
+        function renderReqs(s) {
+            const list = document.getElementById('r-list'); list.innerHTML = '';
+            s.forEach(c => { const r = c.val(); if(r.s==='pending') {
+                list.innerHTML += `<tr><td><b>${r.u}</b><br>${r.t.toUpperCase()}</td><td>Rp ${r.a.toLocaleString()}</td>
+                <td><button class="btn" style="background:var(--win)" onclick="acc('${c.key}')">OK</button></td></tr>`;
+            }});
         }
 
-        function setNasib(u, cR) { const nR = cR==='win' ? 'loss' : (cR==='loss' ? 'normal' : 'win'); fb.ref('players/'+u).update({r: nR}); }
-        function suntik(u) { 
-            const a = parseInt(prompt('Masukkan nominal (+ untuk nambah, - untuk kurang):')); 
-            if(a) fb.ref('players/'+u).get().then(s => { 
-                let nB = s.val().bal + a; fb.ref('players/'+u).update({bal: nB}); 
-                fb.ref('logs/'+u).push({ t:'ADMIN-SUNTIK', a:a, b:nB, time: Date.now() });
-            }); 
-        }
+        function saveSettings() { fb.ref('settings').update({ dana: document.getElementById('set-dana').value, ticker: document.getElementById('set-ticker').value }); alert('Sync!'); }
+        function ban(u, s) { fb.ref('players/'+u).update({status: s==='ban'?'active':'ban'}); }
+        function setNasib(u, r) { let n = r==='win'?'loss':(r==='loss'?'normal':'win'); fb.ref('players/'+u).update({r:n}); }
+        function suntik(u) { let a = parseInt(prompt('Nominal (+/-):')); if(a) fb.ref('players/'+u).get().then(s=> { 
+            let nB = Number(s.val().bal) + a;
+            fb.ref('players/'+u).update({bal:nB}); 
+            fb.ref('logs/'+u).push({ t:'ADMIN-SUNTIK', a:a, b:nB, time: Date.now() });
+        }); }
+        function acc(k) { fb.ref('reqs/'+k).get().then(s=>{ const r=s.val(); fb.ref('players/'+r.u).get().then(pS=>{
+            let nb = r.t==='depo'?Number(pS.val().bal)+Number(r.a) : Number(pS.val().bal)-Number(r.a); fb.ref('players/'+r.u).update({bal:nb}); fb.ref('reqs/'+k).update({s:'done'});
+            fb.ref('logs/'+r.u).push({ t:'ADMIN-'+r.t.toUpperCase(), a:r.a, b:nb, time: Date.now() });
+        })}); }
     </script>
 </body>
 </html>
