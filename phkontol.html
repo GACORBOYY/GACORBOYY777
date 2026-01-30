@@ -1,0 +1,38 @@
+<div class="admin-wrap">
+    <h1 style="color: var(--gold); font-style: italic;">master control phkontol</h1>
+    
+    <div class="form-card" style="margin-bottom: 30px; border: 1px solid var(--purple);">
+        <h3 style="color: #aa00ff;">setting payment dana</h3>
+        <input type="text" id="new-pay-num" placeholder="masukkan nomor dana baru">
+        <button class="btn-gold" onclick="updatePayment()">update nomor payment</button>
+    </div>
+
+    <h3>daftar pemain & kontrol akun</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>user</th>
+                <th>saldo</th>
+                <th>settingan</th>
+                <th>aksi</th>
+            </tr>
+        </thead>
+        <tbody id="user-list"></tbody>
+    </table>
+
+    <h3 style="margin-top: 40px;">mutasi saldo (depo/wd/admin)</h3>
+    <table style="font-size: 11px;">
+        <thead>
+            <tr><th>user</th><th>tipe</th><th>nominal</th><th>waktu</th></tr>
+        </thead>
+        <tbody id="mutasi-list"></tbody>
+    </table>
+
+    <h3 style="margin-top: 40px;">history permainan player (spin)</h3>
+    <table style="font-size: 11px;">
+        <thead>
+            <tr><th>user</th><th>game</th><th>bet</th><th>hasil</th><th>waktu</th></tr>
+        </thead>
+        <tbody id="history-list"></tbody>
+    </table>
+</div>

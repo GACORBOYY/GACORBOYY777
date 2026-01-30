@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>gacorboyy - platinum simulation</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div id="jp-overlay"><div id="jp-type">sensational</div><div class="jp-anim" id="jp-val">rp 0</div></div>
+
+    <div id="auth-screen" class="modal-full" style="display: flex;">
+        <div class="auth-box">
+            <h1 class="logo-gold">gacorboyy</h1>
+            <input type="text" id="u-login" placeholder="id pengguna">
+            <button class="btn-main" onclick="handleAuth()">mulai main</button>
+        </div>
+    </div>
+
+    <div id="app-screen" style="display: none;">
+        <header class="header">
+            <div class="brand">g-777</div>
+            <div class="bal-box"><small>idr</small> <span id="u-bal">0</span></div>
+        </header>
+
+        <div class="game-grid" id="g-list"></div>
+
+        <nav class="footer">
+            <div onclick="location.reload()" class="nav-item active">🏠<br>home</div>
+            <div onclick="openPop('mod-depo')" class="nav-item">💳<br>depo</div>
+            <div onclick="openPop('mod-wd')" class="nav-item">💸<br>wd</div>
+            <div onclick="logout()" class="nav-item">🚪<br>out</div>
+        </nav>
+    </div>
+
+    <div id="mod-play" class="modal-full">
+        <div class="engine-header"><b id="g-title">game</b><span onclick="closeGame()">✕</span></div>
+        <div class="engine-body">
+            <div class="reels" id="reels-ui">
+                <div class="cell">💎</div><div class="cell">💎</div><div class="cell">💎</div>
+                <div class="cell">💎</div><div class="cell">💎</div><div class="cell">💎</div>
+                <div class="cell">💎</div><div class="cell">💎</div><div class="cell">💎</div>
+            </div>
+            <div class="controls">
+                <input type="number" id="bet-amt" value="5000">
+                <button class="btn-main" id="spin-btn" onclick="runSpin()">spin</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mod-depo" class="modal-full">
+        <div class="pop-header win">deposit <span onclick="closePop('mod-depo')">✕</span></div>
+        <div class="pop-body">
+            <div class="pay-info"><small>transfer dana:</small><br><b id="pay-num">loading...</b></div>
+            <input type="number" id="d-amt" placeholder="nominal">
+            <button class="btn-main" onclick="reqDepo()">konfirmasi</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
